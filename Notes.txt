@@ -1,0 +1,38 @@
+1. Can have multiple class in a java class file, but only one class in top-level, means only one class can be public. the others can not be given the public access modifier.
+2. public void setName(String name) => the setName(String name) is called signature (signature includes the method name and the argument of the method)
+3. java FodenClass "Foden" Foden  => input "Foden" or Foden can both be ok with java runtime
+4. import java.util.* will import all classes under java.util, but not import subfolder of util folder
+5. can compile multiple java class in one command: javac packagea/*.java packageb/*.java
+6. if want to compile java file to class file and stored in another folder name classes: javac -d classes packagea/*.java packageb/*.java
+7. to run the class files in 6:
+    java -cp classes packagea.nameOfOneClassFileWithoutExtension
+    or
+    java -classpath ............................................
+    or
+    java --class-path ..........................................
+8. java -cp ".;C:\com\demo\deps;C:\com\demo\myJar.jar" myPackage.MyApp
+    To understand the above command, see below:
+    C:\
+     └── com\
+         └── demo\
+             ├── deps\
+             │   ├── libA.jar
+             │   └── libB.jar
+             ├── myJar.jar
+             │   └── myPackage\
+             │       └── MyApp.class
+             └── main.class
+     first java to start jvm to execute java application
+     second -cp to define classpaths, which is the path to the class files and Jar files that the application will need. The classpath contains multiple paths, separated by <;> (on Windows) or <:> on Unix/Linux
+     third is class path: the first <.> represents the current directory which you are executing the command. Java will treat current folder as a base directory
+                          C:\com\demo\deps This is the path to a directory that contains dependency libraries that MyApp need (libA.jar and libB.jar)
+                          C:\com\demo\myJar.jar This is a specific jar file that contains compiled source code. For example, this file might contain some classes that your application uses
+     Last is myPackage.MyApp This is the full name of the class. MyApp must have a method public static void main(String[] args) for java to know where to start.
+9. Create your own jar file (from files in current folder)
+    jar -cvf myNewJarFile.jar .
+    or
+    jar --create --verbose --file myNewJarFile.jar .
+10. Create your own jar file (from files in custom folder)
+    jar -cvf myNewJarFile.jar -C myFolder
+    or
+    jar --create --verbose --file myNewJarFile.jar -C myFolder
