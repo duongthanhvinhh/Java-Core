@@ -36,3 +36,93 @@
     jar -cvf myNewJarFile.jar -C myFolder
     or
     jar --create --verbose --file myNewJarFile.jar -C myFolder
+11. Foden foden = new Foden(); => In Java, when you create an instance of a class, the static blocks are executed only once when the class is loaded into memory,
+                                  before any instances of the class are created. So, when you execute Foden foden = new Foden();, any static block in the Foden class
+                                  will run before the constructor of Foden is executed.
+12. Primitive Types:
+    Definition: These are the basic data types provided by Java. They hold their values directly and are not objects.
+    Characteristics:
+            Fixed size.
+            Stored in the stack memory.
+            Represent simple values.
+            Cannot be null.
+    boolean: Type true or false, default value is false
+    byte: 8bit integral value, from -128 to 127, default value is 0
+    short: 16bit integral value, from -32,768 to 32,767, default value is 0
+    int: 32bit integral value, from -2,147,483,648 to 2,147,483,647, default value is 0
+    long: 64bit integral value, from -2^63 to 2^63 - 1, default value is 0L, example value is 5106L
+    float: 32bit floating value, default value is 0.0f, example value is 511.183f
+    double: 64bit floating value, default value is 0.0, example value is 511.183
+    char: 16bit unicode value, from 0 to 65,535, default value is \u0000, example value is 'C'
+    => To keep in mind:
+        in Java, boolean true and false are completely unrelated to 1 and 0
+        all numeric types are signed (allow negative numbers)
+        float requires f (or F) at the end
+            float x = 2.7; // Does not compile
+            float x = 2.7f; // OK
+        long requires l (or and preferably L) at the end
+            long a = 45366546327; // Does not compile
+            long a = 45366546327L; // OK
+        for readability the use of underscore (_) is allowed, but NOT in the beginning or the end
+            int a = 1_000_000; // normal usage
+            int b = 1_2; // OK, but not very useful
+            int c = 1________2; // even less useful, but still OK
+            double d = 1_000_000.000_001 // OK and makes sense
+            double x = _10.1; // NOK, do not allowed underscore at the beginning or the end
+13. Non-Primitive Types:
+    Definition: These are more complex data types that are derived from primitive types. They can hold multiple values and are always objects.
+    Characteristics:
+            Variable size.
+            Stored in the heap memory.
+            Can represent collections of values or complex data.
+            Can be null.
+    Strings: are not primitive types in Java, but they are commonly use like primitive
+            String greeting = "hello world";
+            ......................
+            ......................
+            ...Tobe continued.....
+14. Stack and Heap memory:
+    Stack:
+        Definition: The stack is a region of memory that stores temporary variables created by each method (function) call. It operates in a last-in, first-out (LIFO) manner.
+        Characteristics:
+                Storage of Local Variables: Stack memory is used for storing local variables, method parameters, and references to objects in the heap.
+                Automatic Memory Management: Memory is automatically allocated and deallocated. When a method is called, a new block (frame) is created on the stack.
+                                             When the method returns, its frame is removed.
+                Limited Size: Stack memory is generally smaller than heap memory. Its size is defined at the start of the application and can lead to a StackOverflowError
+                              if too much memory is used (e.g., in deep recursion).
+                Fast Access: Accessing data from the stack is faster than from the heap due to its structured nature.
+        Example:
+            public class StackExample {
+                public static void main(String[] args) {
+                    int localVariable = 10;  // Stored in stack
+                    anotherMethod();
+                }
+
+                public static void anotherMethod() {
+                    int anotherVariable = 20; // Also stored in stack
+                }
+            }
+    Heap:
+        Definition: The heap is a region of memory used for dynamic memory allocation, where objects are stored. It is managed by the Java Virtual Machine (JVM).
+        Characteristics:
+                Storage of Objects: All Java objects and their instance variables are stored in heap memory.
+                Dynamic Allocation: Memory can be allocated and deallocated dynamically at runtime using the new keyword.
+                                    Unlike the stack, memory in the heap is not automatically freed when a method exits.
+                Garbage Collection: The JVM includes a garbage collector that automatically reclaims memory used by objects that are no longer referenced,
+                                    helping to prevent memory leaks.
+                Larger Size: Heap memory is generally larger than stack memory, allowing more significant data storage.
+                             However, accessing heap memory can be slower than stack memory due to the overhead of memory management.
+        Example:
+            public class HeapExample {
+                public static void main(String[] args) {
+                    MyObject obj = new MyObject(); // obj is a reference stored in the stack, MyObject is in the heap
+                }
+            }
+
+            class MyObject {
+                int value;
+
+                MyObject() {
+                    value = 10; // Instance variable stored in heap
+                }
+            }
