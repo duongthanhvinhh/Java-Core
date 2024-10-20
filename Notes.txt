@@ -126,3 +126,98 @@
                     value = 10; // Instance variable stored in heap
                 }
             }
+15. Text Blocks: Is a new feature in Java 15
+    i.e
+        The old way: String title = "\"Java Core\"\n    by Foden Duong";
+        String title = """
+            "Java Core"
+               by Foden Duong"""";
+        //The output:
+            "Java Core"
+               by Foden Duong
+    => Remember, after the first """, should be the new line
+       and after the second """, can be the new line or the same line but recommended the new line if you want compiler to insert a new line
+       Any whitespace before the first non-empty character in the line after the 1st """ will be ignored by compiler.
+       Compiler looks for the first non-empty character.
+       But once the compiler finds the first non-empty character, then these spaces (before by Foden Duong""") will be essential,
+       so these are part of the string.
+16. Variables: is a name for a piece of memory which stores data
+    To declare a variable: int x;
+    To initialize a variable: int x = 5;
+    Name of the variable (method, class, interface, package, ...) is called identifier
+    Identifier rules:
+        Must begin with a letter, currency symbol ($, ...), or underscore(_)
+        Can include numbers, but not start with a number
+        Single underscore(_) is not allowed as an identifier
+        You cannot use the reserved word (like: abstract, case, continue, super, import, return, volatile, goto,...)
+    Naming conventions:
+        For variables, use camelCase
+        For constants, use SNAKE_CASE
+        Identifier of classes, interfaces, enums records start with first uppercase letter (e.g MyClass, MyInterface, StudentRecord)
+        Identifiers variables and methods start with first lowercase letter (e.g fullName, getFullName())
+        => Java identifier are case-sensitive !!
+    Multiple variables can be declared/initialized in a single line (bad practice, but it compiles)
+        int x, y;
+        String firstName = "Foden", lastName = "Duong";
+        boolean v = true, w, z = false;
+    but you  cannot mix types (cannot declare variables of different type in a single line)
+        int x, String name; // DOES NOT COMPILE
+        or
+        int x,
+            String name: // "This is same line, as Java seperate lines by semicolon (;)", so DOES NOT COMPILE
+    Three kinds of variables:
+        Local variable - exist only within the block of code { ... }
+        Instance variables (fields) - defined within the specific instance of the object
+        Class variables - belong to a class and is shared with all instances of the class(marked with keyword static)
+    Instance and class variables don't require initialization
+        In-case you don't initialize variable, java will assume the defaults values of their type (i.e for doubles type, the default value is 0.0)
+    Local variables must be initialized before use
+        public int doesNotcompile(){
+            int a = 3;
+            int b;
+            return a + b; // DOES NOT COMPILE as we use b but do not initialize it yet
+        }
+        but
+        public int doesCompile(){
+            int a = 5;
+            int b = 3;
+            int c;
+            return a + b; // COMPIlE because c is not initialized but it's never used
+        }
+    Be careful if initialization is within if-statement
+            public void doesNotCompile(boolean isOK){
+                int a;
+                if(isOK) {
+                    a = 5; // might never be reached
+                }
+                System.out.println(a); // DOES NOT COMPILE, variable a might not have been initialized
+            }
+            but
+            public void doesCompile(boolean isOK){
+                int a;
+                if(isOK) {
+                    a = 5;
+                } else {
+                    a = 2;
+                }
+                System.out.println(a); // COMPILE, because this variable a will be initialized one way or another
+            }
+    Final variables (constants)
+        final int MAX_HEIGHT = 100;
+        Final can be applied to a reference:
+            final int[] MY_NUMBERS = new int[5];
+            in this case, reference cannot be modified, but the content of the object can:
+                        MY_NUMBERS[2] = 10; // OK
+                        MY_NUMBERS = null; // DOES NOT COMPILE as you are trying to modified the reference
+    Variable scope:
+        Local variable: in scope from { to }
+        Method parameters: in scope for the duration of the method
+        Instance variablé: in scope from declaration until the object is eligible for garbage collector
+        Class variables: in scope from declaration until the program ends
+17. Arguments and parameters in Java (Đối số và tham số trong Java):
+    public void greeting(String message){ // message is parameter
+        System.out.println(message);
+    }
+    greeting("Welcome to Java Core"); // Welcome to Java Core is argument
+    => Tham số (parameter) được định nghĩa trong hàm
+       Đối số (argument) là giá trị truyền vào khi gọi hàm
