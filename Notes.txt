@@ -221,3 +221,317 @@
     greeting("Welcome to Java Core"); // Welcome to Java Core is argument
     => Tham số (parameter) được định nghĩa trong hàm
        Đối số (argument) là giá trị truyền vào khi gọi hàm
+18. Call by value and call by reference:
+    In Java, the distinction between call by value and call by reference is important to understand, especially when working with primitive types and objects.
+
+    Call by Value
+        In Java, all method arguments are passed by value. For primitive types (like int, float, etc.), a copy of the value is passed to the method.
+        Changes made to the parameter do not affect the original variable.
+        Example (Primitive Type):
+            public class CallByValue {
+                public static void increment(int x) {
+                    x += 1;  // Changes the local copy only
+                }
+
+                public static void main(String[] args) {
+                    int num = 5;
+                    increment(num);
+                    System.out.println(num);  // Output: 5 (original value remains unchanged)
+                }
+            }
+
+    Call by Reference (for Objects)
+        While Java does not support true call by reference, it passes object references by value.
+        This means that a copy of the reference (pointer) to the object is passed.
+        If you modify the object using this reference, the changes will be reflected in the original object.
+        Example (Object Type):
+            class MyClass {
+                int value;
+                MyClass(int value) {
+                    this.value = value;
+                }
+            }
+            public class CallByReference {
+                public static void modify(MyClass obj) {
+                    obj.value += 1;  // Changes the object referenced
+                }
+                public static void main(String[] args) {
+                    MyClass myObj = new MyClass(5);
+                    modify(myObj);
+                    System.out.println(myObj.value);  // Output: 6 (original object is modified)
+                }
+            }
+    Summary
+    Call by Value: For primitives, a copy of the value is passed; changes do not affect the original variable.
+    Call by Reference (for Objects): A copy of the reference to the object is passed; changes to the object affect the original object.
+19. Local variable reference type:
+        Example:
+            var a = 5; //Compiler will automatically figure out the type of a is int based on the value you passed
+            But
+            var a = "Foden"; //DOES NOT COMPILE if put this line in the same scope of the above line. It means when the compiler figure out the type of variable,
+                                we cannot reassign the type of it
+            And we cannot use local variable reference type for null value
+                var a = null; DOES NOT COMPILE
+        Remember, var is not a reserved word (not like int, final,...), so we can create class, or method name Var
+            public class Var {} //OK
+            or
+            var var = 5; //OK
+            or
+            Var var = new Var(); //OK
+        Remember, it's only work for local variable
+            public int sum (var a, var b){
+                return a + b;
+            } //DOES NOT COMPILE > as it is only work for local variable, not method variable
+        Practical usage:
+            Old way:
+                ClassWithALongName myInstance = new ClassWithALongName();
+                or
+                ClientList<Client> clientList = new ClassWithALongName.getClientList();
+            New way:
+                var myInstance = new ClassWithALongName();
+                or
+                var clientList = new ClassWithALongName.getClientList();
+20. Garbage Collection:
+        All Java objects are stored in program's heap memory (aka free store)
+        Garbage collection is just a process of automatically freeing memory on the heap
+            By removing all the objects which are no longer reachable by the program (Objects are eligible for Garbage collection)
+            This process is out of our control, it's for java to handle automatically
+        There is a system method to force this process : System.gc(); // with this method you can suggest java to clean the heap
+            But it's not guaranteed to do anything !! You can hope that Java will clean the heap, but you can not be guaranteed that Java will do anything
+        Example:
+            public class GcExample {
+                public static void main(String[] args){
+                    String a, b;
+                    a = new String("Foden");
+                    b = new String("Duong");
+                    a = b;
+                    String c = a;
+                    a = null;
+                }
+            }
+            Explain:
+                        Reference (Stack memory)                    Object (Heap memory)
+                    a ---------------------Reference a is pointed to object "Foden"-------------> "Foden"
+                    b ---------------------Reference b is pointed to object "Duong"-------------> "Duong"
+                    a = b, so now ---------Reference a is pointed to the object that is refered by b, that's "Duong"
+                    now a is pointed to object "Duong" and no longer refered to "Foden",
+                    then now "Foden" is eligible for Garbage collection and be removed from Heap memory
+                    then String c = a -----c now is pointed to the object "Duong" which is also pointed to by a
+                    then a = null, a no longer pointed to object "Duong" and now having value null
+21. Operators
+        There are 3 types of operators in Java:
+            Unary operator: = Requires only one operator
+                i++; Increases value by 1 and then return the OLD value
+                    Example:
+                        int a = 5;
+                        int b = a++;
+                        System.out.println(a); // = 6, because a++ increase value of a by 1
+                        System.out.println(b); // still  = 5, because a++ increase value of a by 1, but return the OLD value, then it's 5
+                ++i; Increases value by 1 and then return the NEW value
+                    Example:
+                        int x = 1;
+                        int y = ++x*2
+                        => y = (++x) * 2;
+                        => y = 2 * 2
+                        => y = 4;
+            Binary operator:
+                Addition: a + b;
+                Subtraction: a - b;
+                Multiplication: a * b;
+                Division: a / b;
+                Modulo operator: a % b;
+                    Example:
+                        11 / 2 = 5 (FLOOR value)
+                        11 % 2 = 1 (Remainder of division)
+                    Java promotes variable type, example:
+                        short x = 5;
+                        short y = 7;
+                        System.out.println(x + y); // x and y are promoted to int, the result is int = 12
+                        But
+                        short z = x + y; //DOES NOT COMPILE as you try to put int to short
+            Ternary operator:
+                a = (b > 0) ? 3 : 4;
+        Java automatically promotes smaller to larger data type
+            Example:
+                short x = 5;
+                int y;
+                y = x; //OK (x is casted to int )
+            But can not do it in vice verse
+            Example:
+                int x = 5;
+                short y;
+                y = x; //DOES NOT COMPILE as you try to put int in short
+                but, to have it work, you can cast type
+                y = (short) x; //OK
+        Expression a = 2 do 2 things:
+            First, assign value 2 to a
+            Second return value 2
+            Example:
+                int x = 5;
+                int y = (x = 3) * 2;
+                => x = 3; y = 6
+        Favourite exam trick:
+            boolean isOK = false;
+            if(isOK = true){ // here the assignment operator = , not comparison operator == , so isOK is assigned to new value is true, the "true" will be printed out in the console
+                System.out.println("true");
+            } else {
+                System.out.println("false");
+            }
+        Comparison operators
+            Example:
+                String name1 = new String("Foden Duong");
+                String name2 = new String("Foden Duong");
+                String name3 = name1;
+                System.out.println(name1 = name2); //false because name1 and name2 are pointed to different object in the heap
+                System.out.println(name1 = name3); //true because name1 and name3 are pointed to same object in the heap
+22. Switch Statement:
+        Default could be  anywhere in the block
+        Be careful if there are no break statement:
+            public void greeting(int a){
+                Switch(a){
+                    case 1:
+                        System.out.println("One");
+                    default:
+                        System.out.print("Maximum");
+                    case 2:
+                        System.out.print("Two");
+                    case 3:
+                        System.out.print("Three");
+                }
+            }
+            greeting(5);// The results will be: Maximum Two Three, because there no break so after the default, it will execute all the case after default
+23. Switch Expression:
+        Java 8:
+                    public void greeting(int a){
+                        switch(a){
+                            case 1:
+                            case 2:
+                            case 3:
+                                System.out.print("In first three int numbers");
+                                break;
+                            default:
+                                System.out.print("Not in first three int numbers");
+                                break;
+                        }
+                    }
+        Java 17:
+                    public void greeting(int a){
+                        switch(a){
+                            case 1, 2, 3:
+                                System.out.print("In first three int numbers");
+                                break;
+                            default:
+                                System.out.print("Not in first three int numbers");
+                                break;
+                        }
+                    }
+        Another improvement in Java 17, using -> instead of : then you don't need break statement anymore:
+                    public void greeting(int a){
+                        switch(a){
+                            case 1, 2, 3 -> System.out.print("In first three int numbers");
+                            case 4, 5, 6 -> {
+                                System.out.println("In first three int numbers");
+                                System.out.println("Multiple command should be placed in {}");
+                            }
+                            default -> System.out.print("Not in first three int numbers");
+                        }
+                    }
+        Real improvements, Switch statement can be treated as an expression:
+                String alarmMeAboutNumber = switch(a){
+                              case 1, 2, 3 -> "In first three int numbers";
+                              default -> "Not in first three int numbers";
+                          }; // need ; at the end because this is expression returns a string
+        We can use yield keyword (similar to return statement in methods)
+                Example:
+                    int a = 1;
+                    String greeting = switch(a) {
+                                        case 0, 1, 2 -> {
+                                            String str1 = "Good";
+                                            String str2 = " day";
+                                            yield str1 + str2;
+                                        }
+                                        case 3, 4 -> "Hi";
+                                        default -> "Hello";
+                                       };
+                    System.out.println(greeting); // output is : Good day
+                Another example:
+                    public void greet(int a, int b){
+                        String greeting = switch(a) {
+                            case 0 -> "Good morning";
+                            case 1 -> {
+                                if(b > 0) yield "Good morning";
+                                    else yield "Good afternoon";
+                            }
+                            case 2 -> "Hi";
+                            default -> "Hello";
+                        };
+                        System.out.println(greeting)
+                    }
+                    greet(1, -1); // output is : Good afternoon
+        Switch expression can return different value types:
+            Example:
+                public void greet(int a){
+                    var printOut = switch(a){
+                        case 0 -> "Good morning" //String
+                        case 1 -> 5; //int
+                        case 2 -> true; //boolean
+                        default -> 3.14 //double
+                    }
+                }
+        Switch expression must handle all possible cases -> it means the DEFAULT statement is REQUIRED (except for enum case)
+        If we use enums, we can just list all possible values
+            Example:
+                enum Compass {NORTH, SOUTH, EAST, WEST}
+                String getDirection(Compass value){
+                    return switch(value){
+                        case NORTH -> "Up";
+                        case SOUTH -> "Down";
+                        case EAST -> "Right";
+                        case WEST -> "Left";
+                    }
+                }
+                System.out.println(getDirection(Compass.SOUTH));
+24. While Loop
+        Using break in nested loops, with labels: To stop outer loop in case you're in inner loop
+            Example:
+                int i = 0; j = 0;
+                OUTER_LOOP: while(true){
+                    i++;
+                    j = 0;
+                    INNER_LOOP: while(true){
+                        j++;
+                        System.out.print("(" + i + "," + j + ")");
+                        if(j == 3) break OUTER_LOOP; //break will turn into label OUTER_LOOP, then the outer loop will be ended.
+                                                     //Output is (1,1), (1,2), (1,3)
+                    }
+                }
+        or
+        use return; to terminate the method
+            Example:
+                public void printPairs(){
+                    int i = 0; j = 0;
+                    OUTER_LOOP: while(true){
+                        i++;
+                        j = 0;
+                        INNER_LOOP: while(true){
+                            j++;
+                            System.out.print("(" + i + "," + j + ")");
+                            if(j == 3) return; //exist the method
+                        }
+                    }
+                }
+                printPairs(); //Output is (1,1), (1,2), (1,3)
+25. For Loop:
+        Can omit any one of the statements but still have to keep ; in place
+        Infinite loop
+             for( ; ; ){}
+        You can use more than one index in a for loop, separated by comma
+            for(int i = 0, j = 0; (i + j) < 5; i++, j++) {
+                System.out.println("i=" + i + ", j=" + j);
+                //output;
+                    i=0, j=0
+                    i=1, j=1
+                    i=2, j=2
+            }
+26. For-Each Loop:
+        Is often used to access the members of array (or collection, when you don't need access the index of member actually)
