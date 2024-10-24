@@ -23,7 +23,7 @@
              │       └── MyApp.class
              └── main.class
      first java to start jvm to execute java application
-     second -cp to define classpaths, which is the path to the class files and Jar files that the application will need. The classpath contains multiple paths, separated by <;> (on Windows) or <:> on Unix/Linux
+     second -cp to define classpaths, which is the path to the class files and Jar files that the application will need. The classpath contains multiple paths, separated by <;> semicolon (on Windows) or <:> colon on Unix/Linux
      third is class path: the first <.> represents the current directory which you are executing the command. Java will treat current folder as a base directory
                           C:\com\demo\deps This is the path to a directory that contains dependency libraries that MyApp need (libA.jar and libB.jar)
                           C:\com\demo\myJar.jar This is a specific jar file that contains compiled source code. For example, this file might contain some classes that your application uses
@@ -37,7 +37,7 @@
     or
     jar --create --verbose --file myNewJarFile.jar -C myFolder
 11. Foden foden = new Foden(); => In Java, when you create an instance of a class, the static blocks are executed only once when the class is loaded into memory,
-                                  before any instances of the class are created. So, when you execute Foden foden = new Foden();, any static block in the Foden class
+                                  before any instances of the class are created. So, when you execute Foden foden = new Foden(); any static block in the Foden class
                                   will run before the constructor of Foden is executed.
 12. Primitive Types:
     Definition: These are the basic data types provided by Java. They hold their values directly and are not objects.
@@ -115,7 +115,7 @@
         Example:
             public class HeapExample {
                 public static void main(String[] args) {
-                    MyObject obj = new MyObject(); // obj is a reference stored in the stack, MyObject is in the heap
+                    MyObject obj = new MyObject(); // obj is a reference stored in the stack, new object of MyObject is in the heap
                 }
             }
 
@@ -131,7 +131,7 @@
         The old way: String title = "\"Java Core\"\n    by Foden Duong";
         String title = """
             "Java Core"
-               by Foden Duong"""";
+               by Foden Duong""";
         //The output:
             "Java Core"
                by Foden Duong
@@ -212,7 +212,7 @@
     Variable scope:
         Local variable: in scope from { to }
         Method parameters: in scope for the duration of the method
-        Instance variablé: in scope from declaration until the object is eligible for garbage collector
+        Instance variable: in scope from declaration until the object is eligible for garbage collector
         Class variables: in scope from declaration until the program ends
 17. Arguments and parameters in Java (Đối số và tham số trong Java):
     public void greeting(String message){ // message is parameter
@@ -388,7 +388,7 @@
         Default could be  anywhere in the block
         Be careful if there are no break statement:
             public void greeting(int a){
-                Switch(a){
+                switch(a){
                     case 1:
                         System.out.println("One");
                     default:
@@ -535,3 +535,143 @@
             }
 26. For-Each Loop:
         Is often used to access the members of array (or collection, when you don't need access the index of member actually)
+
+
+
+
+
+
+
+30. String pool (or intern pool):
+    When creating a new string with literal value "Foden", JVM stores it in the memory location known as String pool or intern pool (part of heap memory)
+    Now creating a new string with same literal value "Foden", instead of creating a new memory spot for this literal value, JVM will look in the String pool,
+        then it finds that literal already exists, it will point the new variable to the existing location in the String pool
+    Example:
+        String str1 = "Foden";
+        String str2 = "Foden";
+        System.out.println(str1 == str2); //true, because same content and point to the same location in String pool
+        System.out.println(str1.equals(str2)); //true, equals only compare the content of these 2 strings
+    But, tricky example #1
+        String str1 = "Foden";
+        String str2 = "   Foden  ".trim();
+        System.out.println(str1 == str2); //false, because pool is created at compile-time, but trim() is evaluated at run-time
+    Or even like this, it's still false
+        String str1 = "Foden";
+        String str2 = "   Foden  ";
+        str2 = str2.trim();
+        System.out.println(str2); //Output here is Foden, but the below line still getting false, because pool is created at compile-time, but trim() is evaluated at run-time
+                                  //More explanation: During compile time, compiler will check 2 strings str1 = "Foden" and str2 = "   Foden  ", it sees that these 2 strings are
+                                  //different, then it will assign them to 2 different memory spots in String pool, that's why even after trim(), str2 now is "Foden", but we still
+                                  //get false when trying to compare str1 == str2
+        System.out.println(str1 == str2);
+    Tricky example #2
+        String str1 = "Foden Duong";
+        String str2 = "Foden" + " " + "Duong";
+        System.out.println(str1 == str2); //true, because the concatenation is done in the compile-time
+    There's way to get true in the tricky example #1: That is instruct the compiler to use the pool even with runtime methods
+        String str1 = "Foden";
+        String str2 = "   Foden  ".trim().intern(); //use intern() to tell the compiler that need to evaluate the trim() method
+        System.out.println(str1 == str2); //true
+31. Arrays
+    Many ways to initialize an array:
+            int[] nums = new int[3]; //declare first
+            nums = new int[]{2, 1, 3}; //initialize later
+        or
+            int[] nums = new int[]{2, 1, 3};
+        or
+            int[] nums = {2, 1, 3};
+    Can have multiple values in one declaration but not recommended:
+            int[] nums, ages; // 2 arrays declared
+        or
+            int nums[], a; // 1 array and 1 int number declared
+    Arrays don't implement equals() method, so if you use equals(), it will be treated as == comparison
+    Printing out the array:
+            int[] nums = {2, 1, 3};
+            System.out.println(nums); //Output will something like this I@7a4f0f29, this is the hash code of reference nums.
+        so to print out the array:
+            System.out.println(Arrays.toString(nums)); //Output is [2, 1, 3]
+    Every array has a property called length (It is a property, not a method)
+            int[] nums = {2, 1, 3};
+            System.out.println(nums.length); //Output is 3
+    Methods of Arrays:
+        Arrays.sort():
+                int[] nums = new int[] {2, -4, 7, 17};
+                Arrays.sort(nums);
+                System.out.println(Arrays.toString(nums)); //Output is [-4, 2, 7, 17]
+                => !!! Arrays are mutable,sort() changes the original array.
+        Arrays.binarySearch():
+                Works only on sorted arrays
+                If array is not sorted, then the result is unpredictable
+                This method takes array and array elements as arguments,
+                    if element is found, the index of that element is returned
+                    if element is not found, the negative number is returned -(index_where_it_would_belong + 1)
+                Example:
+                    int[] nums = new int[] {3, -1, 8};
+                    Arrays.sort(nums); // sort array to have binarySearch() works, now array is {-1, 3, 8}
+                    System.out.println(Arrays.binarySearch(nums, -1)); //Output is 0, the index of -1
+                    System.out.println(Arrays.binarySearch(nums, 1)); //Output is -2, why ? if 1 exists in the array, then it should be index 1 => -(index_where_it_would_belong + 1) = -(1 + 1) = -2
+        Arrays.compare():
+                This method determines which array is smaller and returns:
+                    Negative number if first array is smaller than second array
+                    Zero number if the arrays are the same contents
+                    Positive number if first array is larger than second array
+                Definition of what is smaller here:
+                    If one array has less number of elements than another, it's smaller
+                    If both arrays have same number of elements:
+                        Smaller is the one whose first different member is smaller
+                        Example:
+                            int[] nums = new int[] {3, -1, 8};
+                            int[] nums1 = new int[] {3, -2, 8};
+                            => then nums1 is smaller than nums
+                        For Strings:
+                            One is smaller if it is a prefix of another
+                            Numbers are smaller than letters (i.e "232" is smaller than "Fo")
+                            Uppercase is smaller than lowercase
+                            Alphabetical order is applied
+                    Null is smaller than any other values
+
+                Some examples:
+                    Arrays.compare(new int[]{3, 7}, new int[]{4}); => returns positive number, because first array has more elements than second one
+                    Arrays.compare(new int[]{3, 7}, new int[]{3, 7}); => returns 0, because these 2 arrays has the same content
+                    Arrays.compare(new String[]{"ab", "sdfs"}, new String[]{"abs", "shtr"}); => returns negative number, because first elements are different, can see "ab" is prefix of "abs",
+                                                                                                then first array is smaller than second one
+                    Arrays.compare(new String[]{"xy", "sdfs"}, new String[]{"abc", "shtr"}); => returns postive number, because first elements are different, can apply alphabetical order here,
+                                                                                                because "x" is after "a", means "abs" is smaller than "xy", then means first array is larger than second array
+                    Arrays.compare(new String[]{"Foden", "John"}, new String[]{"foden", "Duong"}); => returns negative number, because UpperCase is smaller than lowercase
+        Arrays.mismatch():
+                This method returns -1 if array are the same content, otherwise returns the first index where they differ
+                Example:
+                    Arrays.mismatch(new String[]{"Foden", "Duong"}, new String[]{"Foden", "Vinh"}); => return 1, that is the index of second element where they differ
+    Multidimensional arrays:
+        This is array of arrays:
+        Example:
+            int[][] a = {
+                {-1, 3},
+                {5},
+                {45, 7, -2},
+                {32, 6, 3, 11}
+            }; => This array a has 4 elements type array, first element is an array has 2 element -1 and 3, ... so on
+        Accessing elements with traditional loop:
+            for(int i = 0; i < a.length; i++){
+                for(int j = 0; j < a[i].length; j++){
+                    System.out.println("a(%d, %d) = %d".formatted(i, j, a[i][j])); i is row, j is index in row = j is column
+                }
+            }
+            The result like:
+                a(0,0) = -1
+                a(0,1) = 3
+                a(1,0) = 5
+                a(2,0) = 45
+                ...........
+        Accessing elements with for-each loop:
+            for(int[] row : a){
+                for(int column : row){
+                    System.out.println("Element = " + element);
+                }
+            }
+            The result like:
+                Element = -1
+                Element = 3
+                Element = 5
+                Element = 45
+                ............
