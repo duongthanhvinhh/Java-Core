@@ -536,13 +536,188 @@
 26. For-Each Loop:
         Is often used to access the members of array (or collection, when you don't need access the index of member actually)
 
+27. String
+    String is a sequence of characters, implementing CharSequence interface:
+    String name = "Foden";
+    String name = new String("Foden");
+    Concatenation:
+            str1 + str2
+        or
+            str1.concat(str2)
+        If both operands are numeric, + mean addition
+        If either operand is String, + means concatenation
+        Evaluation is left to right -> System.out.println("Foden" + 4 + 6); //Output is Foden46
+                                       System.out.println("Foden" + (4 + 6)); //Output is Foden10
+        It's allowed to concatenation with null string -> System.out.println("Foden" + null); //Output is Fodennull
+    String Methods:
+        length():
+                String name = "Foden"; -> System.out.println(name.length()); //Output is 5
+        charAt():
+                String name = "Foden Duong"; -> System.out.println(name.charAt(6)); //Output is D (index start from 0, so char at index 6 is D)
+                                             -> System.out.println(name.charAt(17)); //Output is StringIndexOutOfBoundException
+        indexOf():
+                String name = "Doctor Dolittle";    -> System.out.println(name.indexOf('t')); //Output is 3, start finding from index 0, and return the first index of character what is being searched
+                                                    -> System.out.println(name.indexOf('t', 5)); //Output is 11, because start to find from index 5, so the t at index 3 will be ignored
+                                                    -> System.out.println(name.indexOf("cto")); //Output is 2 that is the index of first character of string "cto"
+                                                    -> System.out.println(name.indexOf("Do", 4)); //Output is 7
+                                                    -> System.out.println(name.indexOf("A")); //Output is -1 , means not found
+        substring():
+                String name = "Foden Duong";    -> System.out.println(name.substring(4)); //Output is n Duong (includes start index to the end of string)
+                                                -> System.out.println(name.substring(4, 8)); //Output is n Du (includes start index but does not include end index)
+                                                -> System.out.println(name.substring(4, 4)); //Output is (output is empty string)
+                                                -> System.out.println(name.substring(8, 4)); //Output is IndexOutOfBoundsException
+                                                -> System.out.println(name.substring(4, 14)); //Output is IndexOutOfBoundsException
+        toLowerCase():
+                String name = "Foden Duong"; -> System.out.println(name.toLowerCase()); //Output is foden duong
+        equals(), equalsIgnoreCase():
+                String name1 = new String("Foden Duong");
+                String name2 = new String("Foden Duong");
+                String name3 = new String("foden Duong");
+                System.out.println(name1 == name2); //false, because they are not referencing to the same object
+                System.out.println(name1.equals(name2)); //true, because same content
+                System.out.println(name1.equals(name3)); //false, because String is case-sensitive
+                System.out.println(name1.equalsIgnoreCase(name3)); //true, method equalsIgnoreCase will ignore case sensitive
+        startsWith(), endsWith():
+                String name = "Foden Duong";
+                System.out.println(name.startsWith("F")); //true
+                System.out.println(name.startsWith("Fod")); //true
+                System.out.println(name.endsWith("g")); //true
+                System.out.println(name.endsWith("Duong")); //true
+                System.out.println(name.startsWith('F')); //DOES NOT COMPILE, because argument must be a string, not char !
+        contains():
+                String name = "Foden Duong";
+                System.out.println(name.contains("n")); //true
+                System.out.println(name.contains('n')); //DOES NOT COMPILE, because string implements CharSequence, single quotes for char do not create a CharSequence, then compile error.
+                                                        //need to pass a string or a single charater within double quote ""
+                System.out.println(name.contains("en D")); //true
+                System.out.println(name.contains("m")); //false
+        replace():
+                String str = "abcdeabc";
+                System.out.println(str.replace('c', 'y')); //Output is abydeaby (replaces all instances of 'c' with 'y')
+                System.out.println(str.replace("c", "y")); //Output is abydeaby (parameters can be both string and char)
+                System.out.println(str.replace("abc", "fod")); //Output is foddeabc
+        strip(), trim(), stripLeading(), stripTrailing():
+                String str = " abc ";
+                System.out.println(str.strip()); //Output is abc (strip() removes whitespaces at the beginning and the end, also supports unicode whitespace. It is a recommended way to use in case wanna remove whitespace at beginning and the end)
+                System.out.println(str.trim()); //Output is abc (works same as strip() but does not support unicode whitespace)
+                System.out.println("|" + str.stripLeading() + "|"); //Output is |abc | (remove the whitespaces at the beginning)
+                System.out.println("|" + str.stripTrailing() + "|"); //Output is | abc| (remove the whitespaces at the end)
+        indent(n) method:
+                If n = 0 does nothing
+                If n > 0 adds the same number of blank spaces to each line
+                If n < 0 tries to remove n whitespace characters from the beginning of line
+                Normalizes existing line breaks
+                Adds line break at the end if missing
+        stripIndent() method:
+                Removes all leading incidental whitespace
+                Normalizes existing line breaks
+                Does not add line break at the end if missing
+                    Example for indent(n) and stripIndent():
+                        String str = "  Foden\n Duong";
+                        System.out.println(str); Output is:  Foden
+                                                            Duong
+                        System.out.println(str.indent(2)); //Add 2 whitespaces add the beginning of each line Output is:    Foden
+                                                                                                                           Duong
+                        System.out.println(str.indent(-2)); //Remove 2 whitespaces add the beginning of each line Output is:  Foden
+                                                                                                                             Duong
+                        System.out.println(str.stripIndent()); //Remove all whitespaces of line having total of whitespaces is min, and remove that of whitespace for other lines ,
+                                                               //in this case remove all spaces at the beginning of line Duong, and remove total of that whitespaces in line Foden Output is: Foden
+                                                                                                                                                                                             Duong
+        translateEscapes():
+                String name = "Foden\\tDuong";
+                System.out.println(name); //Output is Foden\tDuong (first t supports to escapes second t, then \t will be printed out)
+                but
+                System.out.println(name.translateEscapes()); //Output is Foden Duong (translateEscapes() method will support to understand the \t, then \t will be treated as a tab)
+        isEmpty(), isBlank():
+                System.out.println("".isEmpty()); //true
+                System.out.println(" ".isEmpty()); //false, because it is not empty
+                System.out.println("".isBlank()); //true
+                System.out.println(" ".isBlank()); //true
+        String formating symbols:
+                %s for any type, usualy for String
+                %d for integral values (int and long)
+                %f for decimal numbers (float and double)
+                    Example:
+                        String name = "Foden";
+                        int numberOfMembers = 5;
+                        String printOut1 = "Family of " + name + " has " + numberOfMembers + " members.";
+                        String printOut2 = String.format("Family of %s has %d members.", name, numberOfMembers);
+                        String printOut3 = "Family of %s has %d members.".formatted(name, numberOfMembers);
+                        => The 3 ways above gives the same result.
+        Method chaining:
+                left -> right
+                String name = " Foden Duong ";
+                System.out.println(name.trim().toUpperCase().replace('F','M')); //Output is Moden Duong
+                !!!Strings are immutable
+                String name = "Foden Duong";
+                name.toUpperCase();
+                System.out.println(name); //Output is still Foden Duong, because string is immutable, so the original value of string will be kept the same
+                But
+                name = name.toUpperCase();
+                System.out.println(name); //Output now is FODEN DUONG
+        String builder:
+                StringBuilder is a mutable class which contains a String
+                It has many methods for manipulating the strings
+                    Example:
+                        StringBuilder name = new StringBuilder("Foden Duong");
+                Some methods work in the identical way as with a normal String substring(), indexOf(), length(), and charAt()
+                Methods:
+                        1. append():
+                                StringBuilder name = new StringBuiler("Foden");
+                                name.append("Duong");
+                                System.out.println(name); //Output is FodenDuong (name is changed now, so can say StringBuilder is mutable)
+                           chaining with append():
+                                name.append(1).append(true);
+                                System.out.println(name); //Output is FodenDuong1true (all arguments are converted to String)
+                        2. insert():
+                                StringBuilder name = new StringBuilder("Foden Duong");
+                                name.insert(6, "Mr. "); //insert to index 5 the Mr.
+                                System.out.println(name); //Output is Foden Mr. Duong
+                           chaining with insert():
+                                StringBuilder name = new StringBuilder("Foden Duong");
+                                name.insert(6, "Mr. ").insert(6, "A"); //be careful, the first insert() will be performed in the original string, but the second insert will be performed in the new string after the first insert completed
+                                System.out.println(name); //Output is Foden AMr. Duong
+                        3. delete():
+                                StringBuilder name = new StringBuilder("Foden Duong");
+                                System.out.println(name.delete(1, 4)); //Output is Fn Duong (remove all characters from 1 to 4, but exclude 4)
+                        4. deleteCharAt():
+                                StringBuilder name = new StringBuilder("Foden Duong");
+                                System.out.println(name.deleteCharAt( 4)); //Output is Fod Duong (remove character at index 4)
+                                System.out.println(name.deleteCharAt( 15)); //Output is StringIndexOutOfBound
+                        5. replace():
+                                StringBuilder name = new StringBuilder("Foden Duong");
+                                System.out.println(name.replace(0, 4, "Vinh")); //Output is Vinhn Duong (will replace string from 0 to index 4 - 1 = 3 by Vinh)
+                                    If final index is too large, replace goes through the end (no exception !!)
+                                        StringBuilder name = new StringBuilder("Foden Duong");
+                                        name.replace(6, 100, "Vinh");
+                                        System.out.println(name); //Output is Foden Vinh
+                        6. reverse():
+                                StringBuilder name = new StringBuilder("FODEN");
+                                name.reverse();
+                                System.out.println(name); //Output is NEDOF
+                        7. toString():
+                                StringBuilder name = new StringBuilder("FODEN");
+                                String nameInString = name.toString();
+                        8. equals():
+                                => Remember StringBuilder doesn't implement equals() method, so if you use equals() for a string builder, it will treat as ==,
+                                => then compiler will compare the references and if the reference is point to different object, it will be false
+                                    Example:
+                                        StringBuilder name1 = new StringBuilder("FODEN");
+                                        StringBuilder name2 = new StringBuilder("FODEN");
+                                        System.out.println(name1 == name2); //false
+                                        System.out.println(name1.equals(name2)); //false as well, because StringBuilder doesn't implement equals() method, the it will treat equals() as ==
+                                => !!! So if we want to compare content we have to convert it back to String:
+                                        System.out.println(name1.toString().equals(name2.toString())); //Output is true
+                        9. substring():
+                                => StringBuilder is mutable class, but there is one exception: substring() returns a String and doesn't change the StringBuilder
+                                        Example:
+                                            StringBuilder name = new StringBuilder("Foden Duong");
+                                            name.substring(6, 11);
+                                            String subName = name.substring(6, 11);
+                                            System.out.println(name); //Output is still Foden Duong (so StringBuilder.substring() is immutable - exception one)
+                                            System.out.println(subName); //Output is Duong
 
-
-
-
-
-
-30. String pool (or intern pool):
+28. String pool (or intern pool):
     When creating a new string with literal value "Foden", JVM stores it in the memory location known as String pool or intern pool (part of heap memory)
     Now creating a new string with same literal value "Foden", instead of creating a new memory spot for this literal value, JVM will look in the String pool,
         then it finds that literal already exists, it will point the new variable to the existing location in the String pool
@@ -572,7 +747,7 @@
         String str1 = "Foden";
         String str2 = "   Foden  ".trim().intern(); //use intern() to tell the compiler that need to evaluate the trim() method
         System.out.println(str1 == str2); //true
-31. Arrays
+29. Arrays
     Many ways to initialize an array:
             int[] nums = new int[3]; //declare first
             nums = new int[]{2, 1, 3}; //initialize later
