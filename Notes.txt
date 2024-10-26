@@ -850,3 +850,138 @@
                 Element = 5
                 Element = 45
                 ............
+30. Dates and Times: Creating Date and Time, Methods on Dates and Times
+            import java.time.*;  //If only use LocalDate, LocalTime, and LocalDateTime
+            import java.time.temporal.*; //Import this one if you want to use chronounits
+            public class DatesAndTimes {
+
+                public static void main(String[] args) {
+                    LocalDate localDate = LocalDate.now();
+                    LocalTime localTime = LocalTime.now();
+                    LocalDateTime localDateTime = LocalDateTime.now();
+                    ZonedDateTime zonedDateTime = ZonedDateTime.now();
+                    System.out.println(localDate);      //Output is: 2024-10-26
+                    System.out.println(localTime);      //Output is: 22:46:33.977090400
+                    System.out.println(localDateTime);  //Output is: 2024-10-26T22:46:33.977090400
+                    System.out.println(zonedDateTime);  //Output is: 2024-10-26T22:46:33.978089600+07:00[Asia/Bangkok]
+
+                    Creating local date: 2 ways
+                            LocalDate d1 = LocalDate.of(2024, Month.OCTOBER, 26);
+                            LocalDate d2 = LocalDate.of(2024, 10, 26);
+                            System.out.println(d1); //Output is: 2024-10-26
+                            System.out.println(d2); //Output is: 2024-10-26 (same as the way above using for creating d1)
+
+                    Creating local time: Many ways to do that
+                            LocalTime t1 = LocalTime.of(22, 52);
+                            LocalTime t2 = LocalTime.of(22, 52, 38);
+                            LocalTime t3 = LocalTime.of(22, 52, 38, 131);
+                            System.out.println(t1); //Output is: 22:52
+                            System.out.println(t2); //Output is: 22:52:38
+                            System.out.println(t3); //Output is: 22:52:38.000000131
+
+                    Creating local date-time: Many ways to do that
+                            LocalDateTime dt1 = LocalDateTime.of(2024, Month.OCTOBER, 26, 22, 55, 59); //yyyy, mm, dd, hh, mm, ss
+                            LocalDate ld1 = LocalDate.of(2024, Month.OCTOBER, 26);
+                            LocalTime lt1 = LocalTime.of(22, 55, 59);
+                            LocalDateTime dt2 = LocalDateTime.of(ld1, lt1);
+                            System.out.println(dt1); //Output is: 2024-10-26T22:55:59
+                            System.out.println(dt2); //Output is: 2024-10-26T22:55:59 (same as above)
+
+                    Creating zoned date-time:
+                            ZoneId zoneId = ZoneId.of("Europe/Zagreb");
+                            ZonedDateTime z1 = ZonedDateTime.of(2024, 10, 26, 23, 2, 19, 32,zoneId); //yyyy, mm, dd, hh, mm, ss, nano second, zoneId
+                            System.out.println(z1); //Output is: 2024-10-26T23:02:19.000000032+02:00[Europe/Zagreb]
+                             ==> +02:00 in the output means that the local time Europe/Zagreb is 2 hours ahead of UTC (Coordinated Universal Time) or aka GMT (Greenwich Mean Time)
+                             ==> If UTC/GMT time is now 1PM, then at Europe/Zagreb it should be 3PM
+
+                    For the exam, you need to know how to convert between time-zones:
+                             ==> 2024-10-26T23:02:19.000000032+02:00[Europe/Zagreb] should be 2024-10-26T21:02:19.000000032 in UTC/GMT
+                             ==> 2024-10-26T23:02:19.000000032-02:00[Europe/Zagreb] should be 2024-10-27T01:02:19.000000032 in UTC/GMT
+
+                    Date-Time Methods:
+                            LocalDate, LocalDateTime
+                                plusYears(), plusMonths(), plusWeeks(), plusDays()
+                                minusYears(), minusMonths(), minusWeeks(), minusDays()
+                            LocalTime, LocalDateTime
+                                plusHours(), plusMinutes(), plusSeconds(), plusNanos()
+                                plusHours(), minusMinutes(), minusSeconds(), minusNanos()
+                            LocalDate, LocalTime, LocalDateTime
+                                isBefore(), isAfter()
+                            Example:
+                                    LocalDate date = LocalDate.of(2024, Month.OCTOBER, 26); //Output is: 2024-10-26
+                                    date = date.plusDays(2); //Output is: 2024-10-28
+                                    date = date.plusWeeks(1); //Output is: 2024-11-04 (calculate from 2024-10-28)
+                                    date = date.plusMonths(4); //Output is: 2025-03-04
+                                    date = date.plusYears(3); //Output is: 2028-03-04
+                            We can do method chaining:
+                                    LocalDateTime localDateTime1 = LocalDateTime.of(2024, Month.OCTOBER, 26, 23, 45, 21);
+                                    localDateTime1 = localDateTime1.minusDays(2).plusHours(4).minusSeconds(20); //Output is: 2024-10-25T03:45:01
+                    Date and time classes are immutable !!!
+                            isBefore(), and isAfter()
+                                    LocalDate date1 = LocalDate.of(2024, 10, 26);
+                                    LocalDate date2 = LocalDate.of(2024, 10, 27);
+                                    System.out.println(date1.isBefore(date2)); //Output is: true
+                }
+            }
+31. Dates and Times: Period, Duration, Instant
+        Period can be used only with LocalDate and LocalDateTime:
+                Period p1 = Period.ofYears(2); //Output is: P2Y    (P2Y stands for Period of 2 Years)
+                Period p2 = Period.ofMonths(3); //Output is: P3M    (P3M stands for Period of 3 Months)
+                Period p3 = Period.ofWeeks(1); //Output is: P7D    (P7D stands for Period of 7 Days = 1 Week)
+                Period p4 = Period.ofDays(11); //Output is: P11D    (P11D stands for Period of 11 Days)
+                Period p5 = Period.of(2, 0, 15); //Output is: P2Y15D (P2Y15D stands for Period of 2 Years, zero Month, and 15 Days)
+        Periods are used with plus/minus on date:
+                Period period = Period.of(1, 2, 5);
+                LocalDate date = LocalDate.of(2024, 10, 26);
+                date = date.plus(period); //Output is: 2025-12-31
+                date = date.minus(period); //Output is: 2024-10-26 (calculate from 2025-12-31)
+        Duration can be used only with LocalTime and LocalDateTime:
+                Duration dr1 = Duration.ofDays(3);     //Output is: PT72H    (PT72H stands for Period of Time 72 Hours)
+                Duration dr2 = Duration.ofHours(3);    //Output is: PT3H
+                Duration dr3 = Duration.ofMinutes(45); //Output is: PT45M
+                Duration dr4 = Duration.ofSeconds(25); //Output is: PT25S
+                Duration dr5 = Duration.ofMillis(230); //Output is: PT0.23S
+                Duration dr6 = Duration.ofNanos(2503); //Output is: PT0.000002503S
+        Using chronoUnits:
+                import java.time.*;
+                import java.time.temporal.*;
+                Duration dr1 = Duration.of(3, ChronoUnit.HALF_DAYS);  //Output is: PT36H
+                Duration dr2 = Duration.of(3, ChronoUnit.DAYS);  //Output is: PT72H
+                Duration dr3 = Duration.of(3, ChronoUnit.HOURS);  //Output is: PT3H
+                Duration dr4 = Duration.of(45, ChronoUnit.MINUTES);  //Output is: PT45M
+                Duration dr5 = Duration.of(30, ChronoUnit.SECONDS);  //Output is: PT30S
+                Duration dr6 = Duration.of(240, ChronoUnit.MILLIS);  //Output is: PT0.24S
+                Duration dr7 = Duration.of(2503, ChronoUnit.NANNOS);  //Output is: PT0.000002503S
+        ChronoUnits can also be used to determine how far apart are two times:
+                    LocalTime t1 = LocalTime.of(17, 20);
+                    LocalTime t2 = LocalTime.of(20, 45);
+                    System.out.println(ChronoUnit.HOURS.between(t1, t2)); //Output is: 3
+                Another
+                    LocalTime t1 = LocalTime.of(17, 46);
+                    LocalTime t2 = LocalTime.of(20, 45);
+                    System.out.println(ChronoUnit.HOURS.between(t1, t2)); //Output is: 2 (even less than 3hours only 1 minutes, but it's still be counted as 2)
+                Another
+                    LocalTime t1 = LocalTime.of(17, 30);
+                    LocalTime t2 = LocalTime.of(20, 45);
+                    System.out.println(ChronoUnit.MINUTES.between(t1, t2)); //Output is: 195
+        Durations are used with plus/minus on time:
+                LocalTime time = LocalTime.of(17, 30);
+                Duration duration = Duration.ofMinutes(45);
+                time = time.plus(duration); //Output is: 18:15
+                Duration duration = Duration.ofMinutes(45);
+                time = time.minus(duration); //Output is: 16:45
+        Instants are used to record time-stamps in the application
+                Instant now = Instant.now();
+                System.out.println(now); //Output is: 2024-10-27T00:25:52.923779102Z  (Z at the end, stands for zone time, because you are recording time-stamps in the application,
+                                                                                       and application is running on your local machine, then it should be in your time zone,
+                                                                                       so that is why only Z here, and thre's no specific zone id was added afer Z)
+                Example: Measure duration of the process
+                    Instant before = Instant.now();
+                    //... some time-consuming process
+                    Instant after = Instant.now();
+                    Duration duration = Duration.between(before, after);
+                    System.out.println(duration.toMillis()); //Output is: 255  (in milli seconds)
+        Converting ZoneTimeDate to instant:
+                ZoneId zone = ZoneId.of("Euro/Zagreb");
+                ZonedDateTime z = ZonedDateTime.of(2024, 10, 27, 00, 33, 35, 145, zone);
+                Instant instant = z.toInstant(); //Output is: 2024-10-27T00:33:35.000000145Z
