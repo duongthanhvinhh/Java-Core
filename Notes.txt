@@ -1,4 +1,5 @@
 1. Can have multiple class in a java class file, but only one class in top-level, means only one class can be public. the others can not be given the public access modifier.
+    Every class in java is automatically a subclass of the Object class
 2. public void setName(String name) => the setName(String name) is called signature (signature includes the method name and the argument of the method)
 3. java FodenClass "Foden" Foden  => input "Foden" or Foden can both be ok with java runtime
 4. import java.util.* will import all classes under java.util, but not import subfolder of util folder
@@ -41,34 +42,63 @@
                                   will run before the constructor of Foden is executed.
 12. Primitive Types:
     Definition: These are the basic data types provided by Java. They hold their values directly and are not objects.
-    Characteristics:
-            Fixed size.
-            Stored in the stack memory.
-            Represent simple values.
-            Cannot be null.
-    boolean: Type true or false, default value is false
-    byte: 8bit integral value, from -128 to 127, default value is 0
-    short: 16bit integral value, from -32,768 to 32,767, default value is 0
-    int: 32bit integral value, from -2,147,483,648 to 2,147,483,647, default value is 0
-    long: 64bit integral value, from -2^63 to 2^63 - 1, default value is 0L, example value is 5106L
-    float: 32bit floating value, default value is 0.0f, example value is 511.183f
-    double: 64bit floating value, default value is 0.0, example value is 511.183
-    char: 16bit unicode value, from 0 to 65,535, default value is \u0000, example value is 'C'
-    => To keep in mind:
-        in Java, boolean true and false are completely unrelated to 1 and 0
-        all numeric types are signed (allow negative numbers)
-        float requires f (or F) at the end
-            float x = 2.7; // Does not compile
-            float x = 2.7f; // OK
-        long requires l (or and preferably L) at the end
-            long a = 45366546327; // Does not compile
-            long a = 45366546327L; // OK
-        for readability the use of underscore (_) is allowed, but NOT in the beginning or the end
-            int a = 1_000_000; // normal usage
-            int b = 1_2; // OK, but not very useful
-            int c = 1________2; // even less useful, but still OK
-            double d = 1_000_000.000_001 // OK and makes sense
-            double x = _10.1; // NOK, do not allowed underscore at the beginning or the end
+        Characteristics:
+                Fixed size.
+                Stored in the stack memory.
+                Represent simple values.
+                Cannot be null.
+        boolean: Type true or false, default value is false
+        byte: 8bit integral value, from -128 to 127, default value is 0
+        short: 16bit integral value, from -32,768 to 32,767, default value is 0
+        int: 32bit integral value, from -2,147,483,648 to 2,147,483,647, default value is 0
+        long: 64bit integral value, from -2^63 to 2^63 - 1, default value is 0L, example value is 5106L
+        float: 32bit floating value, default value is 0.0f, example value is 511.183f
+        double: 64bit floating value, default value is 0.0, example value is 511.183
+        char: 16bit unicode value, from 0 to 65,535, default value is \u0000, example value is 'C'
+        => To keep in mind:
+            in Java, boolean true and false are completely unrelated to 1 and 0
+            all numeric types are signed (allow negative numbers)
+            float requires f (or F) at the end
+                float x = 2.7; // Does not compile
+                float x = 2.7f; // OK
+            long requires l (or and preferably L) at the end
+                long a = 45366546327; // Does not compile
+                long a = 45366546327L; // OK
+            for readability the use of underscore (_) is allowed, but NOT in the beginning or the end
+                int a = 1_000_000; // normal usage
+                int b = 1_2; // OK, but not very useful
+                int c = 1________2; // even less useful, but still OK
+                double d = 1_000_000.000_001 // OK and makes sense
+                double x = _10.1; // NOK, do not allowed underscore at the beginning or the end
+    Wrapper classes:
+        Primitives are not objects, and sometimes we prefer to work with objects
+        Each primitive has a wrapper class
+        The most common way to create an object from the primitive is
+            use static method valueOf()
+            Example:
+                Integer a = Integer.valueOf(5);  //First Integer is class name, then a is the reference variable, then class static method valueOf() of class Integer, 5 is the int literal
+            Table:
+                        |   Primitive Type  |   Wrapper class   |            Example            |
+                        |    boolean        |   Boolean         | Boolean.valueOf(true)   ;     |
+                        |    byte           |   Byte            | Byte.valueOf((byte) 12);      |
+                        |    short          |   Short           | Short.valueOf((short) 12);    |
+                        |    int            |   Integer         | Integer.valueOf(12);          |
+                        |    long           |   Long            | Long.valueOf(12L);            |
+                        |    float          |   Float           | Float.valueOf(12.0F);         |
+                        |    double         |   Double          | Double.valueOf(12.0);         |
+                        |    char           |   Character       | Character.valueOf('c');       |
+            valueOf() can be used to convert String into wrapper class
+            Example:
+                Integer a = Integer.valueOf("12");    //Create variable with wrapper class type
+        Wrapper classes come with some useful methods
+            Convert string to int primitive type:
+                    int intNumber = Integer.parseInt("101");  //Create variable with primitive type
+            And some other useful methods: byteValue(), shortValue(), intValue(), floatValue(), doubleValue(), booleanValue(), and charValue()
+                Example:
+                    Double d = Double.valueOf(314.67);
+                    System.out.println(d.byteValue()); //Output is: 58  (wrap: 314 - 256 = 58)
+                    System.out.println(d.intValue()); //Output is: 314
+                    System.out.println(d.doubleValue()); //Output is: 314.67
 13. Non-Primitive Types:
     Definition: These are more complex data types that are derived from primitive types. They can hold multiple values and are always objects.
     Characteristics:
@@ -985,3 +1015,340 @@
                 ZoneId zone = ZoneId.of("Euro/Zagreb");
                 ZonedDateTime z = ZonedDateTime.of(2024, 10, 27, 00, 33, 35, 145, zone);
                 Instant instant = z.toInstant(); //Output is: 2024-10-27T00:33:35.000000145Z
+32. Local and Instance variables:
+        Local variables:
+            Defined inside the block of code { }
+            Can have only one optional modifier: final
+                Once final variable is assigned a value it cannot be changed
+            Effectively final: doesn't change value in the scope
+                Variable is effectively final if you can put final in variable declaration and the code will still compile
+            All local variables must be explicitly initialized before used
+        Instance variables:
+            Defined on class level, belong to instance of the class
+            Can have different access modifiers: private, protected, public
+            Can be marked as final, volatile, transient
+            If not initialized, they assume default values depending on type
+        Example of Local and Instance variables:
+            class Item{
+                public double tax = 0.2;  //Instance variable
+                public double getPrice(double inputPrice){  //inputPrice is just a parameter for method
+                    double margin = 0.05;  //Local variable
+                    return inputPrice * (1 + tax) * (1 + margin);
+                }
+            }
+            public class ItemHandlerPackage.ItemHandler{
+                public static void main(String[] args){
+                    Item item = new Item();  //Item item: item is a local variable
+                    System.out.println(item.getPrice(100));
+                    Item specialItem = new Item();  //Item specialItem: specialItem is a local variable
+                    specialItem.tax = 0.1;  //Setting a new value for the instance variable tax of instance specialItem
+                    System.out.println(specialItem.getPrice(100));
+                }
+            }
+        Final variable:
+            Whenever you defined a final variable, it needs to be initialized a value !!!
+                    public double getPrice(double inputPrice){
+                        double final margin;
+                        margin = 0.05;
+                        return inputPrice * (1 + tax) * (1 + margin);
+                    }
+            final means that variable reference is constant: the content can be modified, but the reference has to be constant
+                    public void printSomething(){
+                        final int[] a = {2, 5, 4};
+                        a[1] = 3;  //OK , because we are changing the content not changing the reference
+                        System.out.println(Arrays.toString(a));  // [2, 3, 4]
+                        a = null; //DOES NOT COMPILE, because we are trying to change the reference
+                    }
+33. Variable  Arguments (Varargs):
+        Helps method can accept any number of parameters of the same type
+        Two rules to keep in mind:
+            A method can have at most one varargs argument
+            varargs argument must be the last parameter in the parameter list
+        Example:
+                public void greet(String greeting, String... names){
+                    for(String name : names){
+                        System.out.println(greeting + ", " + name + "!");
+                    }
+                }
+                greet("Hello", "Foden", "Vinh"); //Output is: Hello, Foden!\n Hello, Vinh!
+        You can pass an array as varargs
+                String[] allMyNames = {"Foden", "Duong"};
+                greet("Hello", allMyNames); //Output is the same: Hello, Foden!\n Hello, Vinh!
+        You can NOT pass an array as varargs
+                greet("Hello", {"Foden", "Duong"}); //DOES NOT COMPILE, because you are passing an anonymous array
+            but
+                greet("Hello", new String[] {"Foden", "Duong"}); //OK, because it's not an anonymous array ==> But this way is not recommended
+        You can use varargs to write the main() method
+                public static void main(String... args){}  //OK
+34. Access modifiers: (src/main/java và src/test/java is just an organizational structure for source code and does not affect package identification
+                       means if a class is created directly under src/main/java, and a class created directly under src/test/java, they're in the same package,
+                       unless you create a package under these directories)
+        private
+            method or field can be accessed only within the class in which they are declared
+        default (no keyword, means package-private)
+            method or field can be accessed only within the same package
+        protected
+            method or field can be accessed within the same package and outside the package through child class
+            means other class outside the package can only access protected method or field by extends the class, if you create instance of class instead of extends class,
+            you can not access the method or field protected
+        public
+            method or field can be accessed from everywhere in the program
+        Example: public, private
+                class Dog{
+                    private String genus = "Canis";
+                    public void printGenus(){
+                        System.out.println("Genus: " + genus);
+                    }
+                }
+                public class MyClass{
+                    public static void main(String[] args){
+                        Dog dog = new Dog();
+                        System.out.println(dog.genus); //DOES NOT COMPILE
+                        dog.printGenus(); //OK, output is: Genus: Canis
+                    }
+                }
+        Example:
+                //Dog.java
+                package zoo.dogs
+                class Dog{
+                    protected String genus = "Canis";
+                }
+                //Husky.java
+                package zoo.huskys
+                public class Husky extends Dogs{
+                    public static void main(String[] args){
+                        Husky husky = new Husky();
+                        System.out.println(husky.genus); //OK, output is: Genus: Canis
+                    }
+                }
+35. Static Members
+        Static fields, and static methods don't belong to the instance of the class, but rather to class itself
+            Example:
+                    class Item{
+                        public static double tax = 0.2;  //static mean tax belongs to the class Item, not to any instance of the class Item
+                        public double getPrice(double inputPrice){
+                            double margin = 0.05;
+                            return inputPrice * (1 + tax) * (1 + margin);
+                        }
+                    }
+                    public class MyClass{
+                        public static void main(String[] args){
+                            Item item1 = new Item();
+                            System.out.println(item1.getPrice(100));  //Output is: 126.0
+                            Item item2 = new Item();
+                            item2.tax = 0.1;  //Because tax is static, this statement will change the value of tax for all instances of the class
+                            System.out.println(item2.getPrice(100));  //Output is: 115.50000000000001       (tax used here has value 0.1)
+                            System.out.println(item1.getPrice(100));  //Output is: 115.50000000000001       (tax used here also has value 0.1)
+                        }
+                    }
+        Static members can be accessed directly, you don't need to create an instance of the object to access them
+                class Dog{
+                    public static void barks(){
+                        System.out.println("Woof!");
+                    }
+                }
+                public class MyClass{
+                    public static void main(String[] args){
+                        Dog.barks();
+                        or you can also create instance then access it if you want
+                        Dog dog = new Dog();
+                        dog.barks(); //OK, but not recommended
+                    }
+                }
+        Static methods can only call static fields directly
+            Examples: with some problems to understand the context
+                public class MyClass{
+                    String hi = "Good afternoon!";
+                    public static void greet1(){
+                        System.out.println("Hello!");
+                    }
+                    private static void greet2(){
+                        System.out.println(hi); //DOES NOT COMPILE, because method greet2() is static, and it's calling the variable hi which is non-static, it's not allowed by compiler
+                                                //To fix, there are 3 ways, first way is make hi static. The second one is access via new instance of class: System.out.println(new MyClass().hi);
+                                                //The third one is create a static instance of class, and use it at all:
+                                                        public class MyClass{
+                                                            String hi = "Good afternoon!";
+                                                            static MyClass myClass = new MyClass();
+                                                            .......................................
+                                                            public static void greet2(){
+                                                                System.out.println(myClass.hi);
+                                                            }
+                                                            ...................................
+                                                        }
+
+                    }
+                    private void greet3(){
+                        System.out.println("Good day!");
+                    }
+                    public static void greetAll(){
+                        greet1();
+                        greet2();
+                        greet3(); //DOES NOT COMPILE, because method greetAll() is static, and it's calling the method greet3() which is non-static, it's not allowed by compiler
+                                  //To fix, there are 3 ways same above
+                    }
+                    public static void main(String[] args){
+                        MyClass.greetAll();
+                    }
+                }
+        Constants:
+            Are usually marked static final and written in SNAKE_CASE
+                Example:
+                        public class Item(){
+                            public static final double VALUE_ADDED_TAX = 0.25;
+                        }
+            static final fields must be initialized before use, this could be done in a static block
+                Example:
+                        public class Item(){
+                            public static final double VALUE_ADDED_TAX;
+                            static{  //static block will be evaluated only once, when class is loaded to jvm for running,
+                                     //means static block will be evaluated only when you invoke any static method of class, or create new instance of the class in which static block is located
+                                VALUE_ADDED_TAX = 0.25;
+                            }
+                            public double calculatePrice(double price){
+                                return price + price * VALUE_ADDED_TAX;
+                            }
+                        }
+        static imports
+            Are used to import static members of classes
+                Example:
+                    import java.lang.Math.pow;
+                    ..........................
+                    System.out.println(Math.pow(2,3)); //Output is 8
+                    ..........................
+                So if in your code, you need to simplify Math.pow(2,3) in case you repeatedly use it in the entire source code, you can do the static import
+                    import static java.lang.Math.pow;  //the keyword `import` must be at the beginning of the line
+                    .................................
+                    System.out.println(pow(2,3)); //Now it's shorter
+                    .................................
+36. Boxing and Unboxing
+        Boxing:
+            Is a process of converting a primitive into its wrapper class (putting primitive in the box)
+        Unboxing:
+            Is a process of converting a wrapper class to a primitive (getting primitive out of the box)
+            Explicit:
+                Example:
+                    int a = 4;
+                    Integer b = Integer.valueOf(a);  //Convert int to Integer ==> boxing
+                    int c = b.intValue();  //here a is the instance of wrapper class Integer, Convert wrapper to int ==> unboxing
+            Implicit:
+                Example:
+                    int a = 4;
+                    Integer b = a;  //Convert int to Integer ==> boxing (AutoBoxing)
+                    int c = b;  //Convert wrapper to int ==> unboxing
+        To remember:
+            As you may know Java will autocast (auto casting) a smaller primitive into the larger one
+            But Java will not do both automatic operations (autocast and autoboxing) at the same time!!!
+            Example:
+                int a = 3;
+                long b = a; //Since int is a smaller primitive than long, then a will be auto-casted to long ==> OK
+                but
+                Long c = a; //DOES NOT COMPILE, because java will not perform autocast and autoboxing at the same time
+                but
+                Long c = Long.valueOf(a); //OK, because you explicit boxing here, java will only need to do one autocast operation
+                and also
+                Long c = (long) a; //OK, because you cast a from int to long, java will only need to do one autoboxing operation
+                and also
+                Long c = Long.valueOf((long) a); //OK, you cast a from int to long, and explicit do boxing here, then java doesn't need to do any automatic operation
+            Another tricky example:
+                Long a = 10; //here without L at the end, java will treat a as int number with value = 10 ==> DOES NOT COMPILE, because both autocasting and autoboxing is required here
+                but
+                Long a = 10L; //OK, java only need to perform autoboxing here
+37. Method overloading
+        Method overloading in Java allows you to define multiple methods with the same name but different parameters (different types, different total number of parameters, or order of parameters)
+        Example:
+                class MathOperations {
+                    // Method to add two integers
+                    public int add(int a, int b) {
+                        return a + b;
+                    }
+                    // Overloaded method to add three integers
+                    public int add(int a, int b, int c) {
+                        return a + b + c;
+                    }
+                    // Overloaded method to add two doubles
+                    public double add(double a, double b) {
+                        return a + b;
+                    }
+                    // Overloaded method to add an integer and a double
+                    public double add(int a, double b) {
+                        return a + b;
+                    }
+                }
+                public class Main {
+                    public static void main(String[] args) {
+                        MathOperations math = new MathOperations();
+
+                        // Calling the different overloaded methods
+                        System.out.println("Sum of two integers: " + math.add(5, 10)); // Calls add(int, int)
+                        System.out.println("Sum of three integers: " + math.add(5, 10, 15)); // Calls add(int, int, int)
+                        System.out.println("Sum of two doubles: " + math.add(5.5, 10.5)); // Calls add(double, double)
+                        System.out.println("Sum of an integer and a double: " + math.add(5, 10.5)); // Calls add(int, double)
+                    }
+                }
+        To remember:
+            In passing argument doesn't exactly match the parameter type, java will pick the most similar version of the method
+                    Example:
+                        public void greet(int x) { System.out.println("parameter is int type"); }
+                        public void greet(double x) { System.out.println("parameter is double type"); }
+                        public void greet(int x, int y) { System.out.println("parameter is int type with 2 arguments"); }
+                        short a = 2;
+                        greet(a); //Output is: parameter is int type
+                    Explanation:
+                        When a short is passed to method greet(), Java first looks for a method that accepts an short parameter, if no such method exists, java will looks for larger primitive type is int, then long, ... and so on
+                        with the list of Automatic Promotions as below:
+                                byte → int, long, float, double     //For example, this one if java cannot find exact match for method with byte parameter, then will looks for a method accepts int, if still no, then long,... and so on
+                                short → int, long, float, double
+                                char → int, long, float, double
+                                int → long, float, double
+                                long → float, double
+                                float → double
+                    Another tricky example:
+                               public void greet(Short a) { System.out.println("parameter is an instance of Short wrapper class"); }
+                               public void greet(Integer a) { System.out.println("parameter is an instance of Integer wrapper class"); }
+                               public void greet(String str) { System.out.println("parameter is an instance of String wrapper class"); }
+                               public void greet(Object obj) { System.out.println("parameter is object type"); }
+                               greet(2.3); //Java looks for a method with primitive type double, but you can see all of 4 methods above are not accepting any primitive parameter
+                                           //So now Java will perform auto boxing, and it will convert double primitive into Double wrapper class
+                                           //And then since there is NO greet() method which takes the instance of the wrapper class Double as a parameter
+                                           //Java will try to find a superclass of the class Double, so this should be Object class (You already know every class in Java will automatically be a subclass of class Object)
+                                           //So the method public void greet(Object obj) will be call here
+                                           //Then Output is: parameter is object type
+                               but
+                               greet((short) 2); //Java looks for a method with primitive type short, but you can see all of 4 methods above are note accepting any primitive parameter
+                                                 //So now Java will perform auto boxing, and it will convert short primitive into Short wrapper class
+                                                 //Then Java found a method which accepts an instance of wrapper class Short as a parameter, which is public void greet(Short a)
+                                                 //Then Output is: parameter is an instance of Short wrapper class
+                    Another tricky example:
+                            As you may know in the example above, after Java autoboxing primitive to wrapper class, then if it still cannot find any methods that accepts exact instance of wrapper class as a parameter
+                            java will looks for a method accepts an object (because Object is actually a super class of every class in Java)
+                            But
+                            before Java looks for a method accepts an object, like an example above
+                            java will looks for supertypes before looking for method accepts an object when it tries to determine which method to run
+                                    public void greet(Number a) { System.out.println("Number abstract class here for a tricky example"); } //Number is an abstract class
+                                                                                                                                           //and all other wrapper classes (except for String) which you get from your primitives,
+                                                                                                                                           //they extend this abstract class Number
+                                    public void greet(CharSequence a) { System.out.println("CharSequence interface here for a tricky example"); } //CharSequence is an interface
+                                                                                                                                                  //and wrapper class String implements this interface CharSequence
+                                                                                                                                                  //so we can say `CharSequence is a supertype of String`
+                                    public void greet(Object obj) { System.out.println("Object class here for a tricky example"); }
+                                    greet(3.14); //Since 3.14 is a double with primitive type, java will looks for a method which accepts exactly this primitive type first
+                                                 //If there is NO, then this primitive double will be wrapped into wrapper class double
+                                                 //And then since there is NO greet() method which takes an instance of wrapper class Double as a parameter
+                                                 //Java will looks for the super type.
+                                                 //Since Number is supertype of Double, then the method will be executed is
+                                                 //public void greet(Number a)  ==> Output is: Number abstract class here for a tricky example
+                                    greet("Foden"); //same above
+                                                    //wrap "Foden" to String, which implements CharSequence ==> executed method: public void greet(CharSequence a) ==> Output is: Number abstract class here for a tricky example
+                                    greet(new int[] {2, 1, 3}); //method public void greet(Object obj) will be executed ==> Output is: Object class here for a tricky example
+            You cannot overload array with varargs !!!
+                    Example:
+                            public int doSomething(int[] nums) {  };
+                            public int doSomething(int... nums) {  }; //DOES NOT COMPILE,
+                                                                      //Because if you call method like this doSomething(new int[] {2, 1, 3});
+                                                                      //It is impossible for Java to know which of these two methods to call, because it could be both
+        In conclusion
+                The order Java uses for finding the right overloaded methods:
+                    Exact match by type
+                    Larger primitive type
+                    Autoboxed type
+                    Supertype
