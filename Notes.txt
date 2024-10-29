@@ -1298,7 +1298,9 @@
                         with the list of Automatic Promotions as below:
                                 byte → int, long, float, double     //For example, this one if java cannot find exact match for method with byte parameter, then will looks for a method accepts int, if still no, then long,... and so on
                                 short → int, long, float, double
-                                char → int, long, float, double
+                                char → int, long, float, double    // You may be confused here, how char is promoted to int :D, char c = 'A'; // 'A' has a Unicode value of 65
+                                                                                                                                int j = c;    // j now holds the value 65
+                                                                                                                                System.out.println(j); // This will print 65
                                 int → long, float, double
                                 long → float, double
                                 float → double
@@ -1352,3 +1354,321 @@
                     Larger primitive type
                     Autoboxed type
                     Supertype
+35. Inheritence:
+            Subclass can inherit members not private (fields and methods) from super class
+            Java only supports single inheritance - Means class can only one direct superclass
+      One class can implement multiple interface
+      Class modifiers:
+            final
+          abstract
+          static
+          sealed     (java 17 or later)
+          non-sealed (java 17 or later)
+            All Java classes implicitly inherit from java.lang.Object class
+      java.lang.Object class is the only class which doesn't have a parent class
+      Every class has access to methods defined in Object class (e.g toString(), equals(), hashCode(), etc.)
+36. Creating Classes:
+            Keyword "this" is used to access the members of the class you're in
+        Example:
+            //Dog.java class
+          public class Dog{
+            private String name;
+            protected int age;
+            public void setAge(int age){
+                this.age = age; //this.age to access the instance variable age of Dog class
+            }
+          }
+      Setter method without using "this" in-case parameter name of method and instance field name are different
+        Example:
+            public void setAge(int theAge){
+            age = theAge
+          }
+            Setter method using "this"
+        Example:
+            public void setAge(int age){
+            this.age = age;
+          }
+            Keyword "super" is used to access the members of the superclass
+        Example1:
+            class Animal{
+            void sound(){
+                System.out.println("Animal makes a sound");
+            }
+          }
+          class Dog extends Animal{
+            void sound(){
+                super.sound(); //call the parent class method
+              System.out.println("Dog barks");
+            }
+          }
+          public class Test{
+            public static void main(String[] args){
+                Dog myDog = new Dog();
+              myDog.sound();
+            }
+          }
+          //Output is:
+            Animal makes a sound
+            Dog barks
+        Example2:
+            class Animal{
+            void sound(){
+                System.out.println("Animal makes a sound");
+            }
+          }
+          class Dog extends Animal{
+            void sound(){
+                super.sound(); //call the parent class method
+              System.out.println("Dog barks");
+            }
+          }
+          public class Test{
+            public static void main(String[] args){
+                Animal myDog = new Dog(); //create instance myDog type reference Animal, but it's still the object of Dog class,
+                                                                //so it will still call sound() method in Dog class
+              myDog.sound();
+            }
+          }
+          //Output is:
+            Animal makes a sound
+            Dog barks
+        Example3:
+            class Animal{
+            void sound(){
+                System.out.println("Animal makes a sound");
+            }
+          }
+          class Dog extends Animal{
+            void sound(){
+                super.sound(); //call the parent class method
+              System.out.println("Dog barks");
+            }
+          }
+          public class Test{
+            public static void main(String[] args){
+                Animal myDog = new Animal(); //create instance myDog of Animal class
+                                                                //so it will call sound() method in Animal class
+              myDog.sound();
+            }
+          }
+          //Output is:
+            Animal makes a sound
+        Example4:
+            class Animal{
+            void sound(){
+                System.out.println("Animal makes a sound");
+            }
+          }
+          class Dog extends Animal{
+            void sound(){
+                super.sound(); //call the parent class method
+              System.out.println("Dog barks");
+            }
+          }
+          public class Test{
+            public static void main(String[] args){
+                Dog myDog = new Animal(); //DOES NOT COMPILE, because you cannot assign a parent class object to a child class reference
+                                                                //this is because a parent class does not have all the attributes and methods that might be present in a child class
+                                        //then making it an invalid assignment
+              myDog.sound();
+            }
+          }
+        Example5:
+            //Mammal.java class
+          public class Mammal{
+            private int age;
+            protected String name;
+            public void setAge(int age){
+                this.age = age;
+            }
+            public int getAge(){
+                return this.age;
+            }
+          }
+
+          //Dog.java class
+          public class Dog extends Mammal{
+            //setNameAndAge method without using "super"
+            protected void setNameAndAge(String dogName, int age){
+                name = dogName;
+              setAge(age);
+            }
+            //setNameAndAge method using "super"
+            protected void setNameAndAge(String name, int age){
+                super.name = name; //because instance name in parent class has same name as method parameter
+                                                 //so need to use super.name to indicate that the name belongs to parent class
+              setAge(age);
+            }
+          }
+37. Creating Constructors
+            Special methods which are called everytime you created an instance of an object
+      Name of the constructor must match the name of the class
+      Constructor don't have a return type !!!
+            If the return type is stated, than it's just a normal method (name of method has the same name as class - Valid case but not recommended)
+      Constructor overloading
+            Example:
+              public class Dog{
+                private String name;
+                private int age;
+                public Dog() { System.out.println("Woof!"); }
+                public Dog(String name, int age){
+                  this.name = name;
+                  this.age = age;
+                }
+                public Dog(String name) { this.name = name; }
+                public Dog(int age) { this.age = age; }
+                public Dog(boolean isPuppy, String name){
+                  this.age = isPuppy ? 0 : -1;
+                  this.name = name;
+                }
+                //Main method:
+
+          }
+            Constructors are usually made public
+        But you can also make them protected, default or private
+      Private constructors are used if you don't want public no-argument constructor to be generated by the compiler
+        In this case, the instance is usually created via some static method, and not using the keyword new
+        We have seen this behaviour in classes used to create Dates and Times
+                LocalDate now = LocalDate.now(); //We cannot create instance like LocalDate now = new LocalDate();
+                                                                             //This is because LocalDate class has a private constructor
+                                                                                         //So in this case, instance is created when we call the static method now()
+38. Using this() and super() keywords
+            Special method this() is used to call another constructor in a constructor
+                    Example:
+                        public class Dog{
+                          private String name;
+                          private int age;
+                          public Dog(String name, int age){
+                            this.name = name;
+                            this.age = age;
+                          }
+                          public Dog(){
+                            this("Chip", 1); //this will call constructor public Dog(String name, int age)
+                            System.out.println("Woof!");
+                          }
+                          public static void main(String[] args){
+                            Dog dog = new Dog();
+                            System.out.println("Name: " + dog.name + ", " + "Age: " + dog.age);
+                            //Output is:
+                                                        Woof!  (this is printed first, because this is printed out statement,
+                                              so it will be executed first when obj instance is created, then this("Chip", 1) will be executed later)
+                                  Name: Chip, Age: 1
+                          }
+                        }
+                    There are several rules when using this()
+                            this() can only be called in the first line in the constructor
+                            this() can be called only once
+                    becareful when create a "cycle", example constructor 1 uses this() to call constructor 2,
+                                                     then constructor 2 use this() to call constructor 3,
+                                                     ...becareful it can direct you to an infinite loop, then breaks your code 😃
+                            Example1:
+                                    public Dog(){
+                                        System.out.println("Woof!");
+                                      this("Chip", 1); //DOES NOT COMPILE, because this() must be called in the first line in the constructor
+                                    }
+                            Example2:
+                                    public Dog(){
+                                        this();  //constructor no-arg calls itself, then it will be in an infinite loop
+                                                     //====> Then eventually a stack overflow error will be thrown
+                                      System.out.println("Woof!");
+                                    }
+                            Example3:
+                                    public Dog(){
+                                        this("Chip", 1); //Call constructor below
+                                      System.out.println("Woof!");
+                                    }
+                                    public Dog(String name, int age){
+                                        this();  //Again call constructor above, then again call... ==> will be a cycle (infinite loop) ==> Stack Overflow Error
+                                      this.name = name;
+                                      this.age = age;
+                                    }
+            Special method super() is used to call a constructor of a superclass in a constructor of the subclass
+                    Example:
+                            //Mammal.java class
+                            class Mammal{
+                                public int age;
+                              public Mammal(int age){
+                                this.age = age;
+                              }
+                            }
+                            public class Dog extends Mammal{
+                                private String name;
+                              public Dog(String name, int age){
+                                super(age); //Call constructor of super/parent class
+                                this.name = name;
+                                System.out.println("Woof!");
+                              }
+                            }
+                    Rules for using super()
+                            If there is NO explicit this() or super() in the first line of the constructor
+                                the compiler will insert super() at the beginning of EVERY constructor
+                            Can be called only once (means everyone constructor in subclass can only call super() 1 times)
+                            Must be called in the first line of the constructor
+                            !!!If there is NO this() or super() in the first line, then the compiler will insert super() automatically
+                                    Example:
+                                        class Mammal{
+                                        public int age;
+                                      }
+                                      public class Dog extends Mammal{
+                                        private String name;
+                                        public Dog(){
+                                            ==>!!!because there's no this() or super() here,
+                                          ==>  so compiler will insert the call for special method super()
+                                          ==>  to call constructor no-arg of super class
+                                          System.out.println("Woof!");
+                                        }
+                                      }
+                            Be careful if the superClass doesn't have the no-argument constructor
+                            Example:
+                              class Mammal {
+                                    private int age;
+                                    public Mammal(int age){
+                                        this.age = age;
+                                    }
+
+                                }
+                              public class Main extends Mammal{
+                                    public Main(){
+                                            ==> DOES NOT COMPILE
+                                        ==> Because in here there is NO super() or this(), then compiler will insert no-arg constructor of super class to here
+                                        ==> But you can see in the super class Mammal, a constructor with parameter a is defined already public Mammal(int a) { this.age = age; }
+                                        ==> So the default no-arg constructor will NOT be created, then when compiler trys to insert no-arg constructor to constructor of subclass
+                                        ==> It cannot, because no-arg doesn't exist in super class, so that compilation error will be thrown in this case
+                                        System.out.println("Test");
+                                    }
+                                    public static void main(String[] args){
+                                        Main main = new Main();
+                                    }
+                                }
+39. Initializing Objects
+            Order of initialization
+                What happens when we initialize a class?
+                        If there is a superclass, it is initialized first
+                        All static variables are processed (in order of appearence)
+                        All static initializers are processed (in order of appearance)
+                        ==> This all happens at most once for each class!!
+            Class is initialized automatically if main() method is inside the class,
+                or manually by calling "new ClassName();"
+            Example:
+                  class Mammal{
+                      static { System.out.println("Hello."); }
+                  }
+                  public class Dog extends Mammal{
+                    public static void main(String[] args){
+                        System.out.println("Good afternoon.");
+                      new Dog();
+                      new Dog();
+                    }
+                    static { System.out.println("Woof!"); }
+                  }
+                  //Output is:
+                    Hello.
+                    Woof!
+                    Good afternoon
+                  //Explanation:
+                        Main method inside class Dog, so class Dog will be initialized
+                      Class Dog has superclass Mammal, so class Mammal will be initialized first
+                      Then static block inside superclass Mammal will be initialized,
+                      Then static block in side class Dog will be initialized
+                      Then System.out.println() statement in main method will be called
+                      Then new Dog(); new Dog(); makes no effect, because the rule above "This all happens at most once for each class!!"
