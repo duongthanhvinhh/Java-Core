@@ -1,0 +1,189 @@
+import java.io.FileNotFoundException;
+import java.io.IOException;
+
+Throwable
+  |-- Error
+  |     |-- LinkageError
+  |     |     |-- ClassNotFoundError
+  |     |     |-- NoClassDefFoundError
+  |     |-- VirtualMachineError
+  |           |-- OutOfMemoryError
+  |           |-- StackOverflowError
+  |-- Exception
+       |-- IOException
+       |     |-- FileNotFoundException
+       |     |-- EOFException
+       |-- SQLException
+       |-- ClassNotFoundException
+       |-- RuntimeException
+            |-- ArithmeticException
+            |-- NullPointerException
+            |-- ArrayIndexOutOfBoundsException
+            |-- IllegalArgumentException
+            |     |-- NumberFormatException
+            |-- ClassCastException
+            |-- IllegalStateException
+
+39.
+                final instance variables must assume the value by the time the constructor completes !
+                final local variables must have value only if used
+                        public class Item{
+                            private final double tax;
+                            private final double price;
+                            public Item(){
+                                this.price = 12.5;  //assignment in the constructor
+                            }
+                            { tax = 0.2 }  //assignment in the instance initializer
+                        }
+                        ==> This is OK, because the instance initializer is processed before constructor.
+                            but if we don't assign the value for tax and price, it will be compile error
+        Order of initialization when creating an instance
+            What happens when we initialize an instance of a class?
+                    Initialize the class if it was not already initialized (mentioned in the above section)
+                    If there is a superclass, initialize superclass
+                    Process all instance variable declarations
+                    Process all instance initializers
+                    Initialize the constructor
+            Example:
+                class Mammal{
+                    static { System.out.println("Hello!"); }
+                    { System.out.println("Good afternoon"); }
+                }
+                public class Dog extends Mammal{
+                    private String name = "Foden";
+                    { System.out.println("Name: " + name); }
+                    private static int i = 0;
+                    static { System.out.println(i); }
+                    {
+                        i++;
+                        System.out.println(i);
+                    }
+                    public Dog(){
+                        System.out.println("I am in the constructor of Dog class!");
+                    }
+                    public static void main(String[] args){
+                        System.out.println("I am the main one.");
+                        Dog dog = new Dog();
+                    }
+                }
+                //Output:
+                        Hello!
+                        0
+                        I am the main one.
+                        Good afternoon
+                        Name: Foden
+                        1
+                        I am in the constructor of Dog class!
+                //Explanation:
+                1. Because main() method inside Dog class, then class Dog will be initialized
+                    but Dog class has super class Mammal, so Mammal class will be initialized
+                2. static block in class Mammal will be executed first, then private static int i = 0; in the subclass
+                    will be executed second, then the static block in the subclass Dog will be executed.
+                3. then go back to the main() method, the System.out.println("I am the main one."); will be executed
+                4. then execute line Dog dog = new Dog(); so now follow `What happends when we initialize intance of a class`
+                    ,process all instance variable declarations, so private String name = "Foden" in subclass Dog will be processed
+                    ,then process all instance initializers, so initializer block { System.out.println("Good afternoon"); } in Mammal class will be processed
+                    ,then 2 initializer blocks in subclass will be processed { System.out.println("Name: " + name); } and   {
+                                                                                                                                i++;
+                                                                                                                                System.out.println(i);
+                                                                                                                            }
+                5. Finally, initialize the constructor, then the System.out.println("...") statement inside constructor will be executed.
+40. Inheriting Members
+        Inheriting Methods
+                subclass can override an inherited method
+                    subclass declares a new implementation for an inherited method
+                    with same signature (name & parameters)
+                    and covariant return type
+                the property of the object to take many different forms is called polymorphism
+                Example:
+                    class Mammal{
+                        public Mammal speak(){
+                            System.out.println("Mammal is making a sound.");
+                            return this;
+                        }
+                    }
+                    public class Dog extends Mammal{
+                        @Override  //This annotation is optional
+                        public Dog speak(){   //The return type of speak() method in class Mammal is Mammal,
+                                              //but the return type of the speak() method of Dog class is Dog.
+                                              //Both methods have different return type but it is method overriding. This is known as covariant return type
+                            System.out.println("Woof!");
+                            return this;
+                        }
+
+                        public static void main(String[] args) {
+                            Mammal mammal = new Mammal();
+                            Dog dog = new Dog();
+                            mammal.speak();
+                            dog.speak();
+                        }
+                    }
+                Method Overriding Rules: When you put the @Override, you need to follow the following rules
+                    Overriden method must have the same signature as superclass method
+                    Overriden method must be at least as accessible as the original method
+                        it means if method in super class is public, when you override you cannot make it less accessible by using protected => it's not allowed in Java
+                    Overriden method may not declare a checked exception that is new or broader than the one in original method
+                        it means if method in super class is explicitly declared will throws IOException,
+                            then in the method of subclass, we cannot explicit it to throws Exception, because Exception is broader than IOException
+                            but you can do explicit it to throws FileNotFoundException, because FileNotFoundException is subclass of IOException
+                    Return type of overriden method must be the same or a subtype of the return type of the original method (covariant return types)
+                Example:
+                    Case Exception:
+                        //checked exception FileNotFoundException is subclass of IOException
+                        class A{
+                            public void greet() throws IOException{}
+                            public void sayHello(){}
+                            public void leave(){} throws FileNotFoundException
+                        }
+                        public class B extends A{
+                            public void greet() throws FileNotFoundException //OK because FileNotFoundException is subclass of IOException
+                            public void sayHello(){} throws IOException //NOT OK, becasue the method in superclass isn't declared to throws any exception
+                            public void leave(){} throws IOException //NOT OK, because you are trying to declare a checked exception that is broader than the original one
+                        }
+                Overriding private and static methods
+                    If the method is private, it's not visible to other classes, if we have a private method in superclass
+                        then the method with same signature in subclass is independent of that method,
+                        means this is not overriding, it's just completely different method
+                    If the method is static, "overriden" method must also be declared static,
+                        and also actually this is "not overriding", since every method belongs to its own class
+                        this is called "hiding" the method
+                    Method marked as final cannot be overriden nor hidden
+                        Example:
+                            //hiding a static method
+                            class A{
+                                public static void greet() { System.out.println("Hello"); }
+                            }
+                            public class B extends A{
+                                public static void greet() { System.out.println("Good afternoon."); }  //Here if you don't declare greet() as static, it will be compile error
+
+                                public static void main(String[] args) {
+                                    A.greet(); //Output is: Hello.
+                                    B.greet(); //Output is: Good afternoon.
+                                }
+                            }
+                Variables cannot be overriden, only hidden
+                    class Mammal{
+                        public String name = "Unknown";
+                        public void greet(){
+                            System.out.println("Unknown greet method");
+                        }
+                    }
+                    public class Dog extends Mammal{
+                        public String name = "Rex";
+                        public void greet(){
+                            System.out.println("Rex greet method");
+                        }
+
+                        public static void main(String[] args) {
+                            Dog d = new Dog();
+                            Mammal m = d; // ~ Mammal m = new Dog();
+                            System.out.println(d.name); //Output is: Rex
+                            System.out.println(m.name); //Output is: Unknown
+                            d.greet(); //Output is: Rex greet method
+                            m.greet(); //Output is: Rex greet method  (why ? see keypoints below)
+                            //Key points:
+                                Variable Access: Determined by the reference type. `m.name` accesses name in Mammal
+                                Method Call: Determined by the actual object type at runtime. `m.greet()` calls the greet method in Dog
+                                             (because Mammal m = new Dog(), then m is pointing to object new Dog())
+                        }
+                    }
