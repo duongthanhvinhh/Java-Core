@@ -3,8 +3,31 @@
 2. public void setName(String name) => the setName(String name) is called signature (signature includes the method name and the argument of the method)
 3. java FodenClass "Foden" Foden  => input "Foden" or Foden can both be ok with java runtime
 4. import java.util.* will import all classes under java.util, but not import subfolder of util folder
-5. can compile multiple java class in one command: javac packagea/*.java packageb/*.java
-6. if want to compile java file to class file and stored in another folder name classes: javac -d classes packagea/*.java packageb/*.java
+5. Errors and Exceptions overview in Java:
+            Throwable
+              |-- Error
+              |     |-- LinkageError
+              |     |     |-- ClassNotFoundError
+              |     |     |-- NoClassDefFoundError
+              |     |-- VirtualMachineError
+              |           |-- OutOfMemoryError
+              |           |-- StackOverflowError
+              |-- Exception
+                   |-- IOException
+                   |     |-- FileNotFoundException
+                   |     |-- EOFException
+                   |-- SQLException
+                   |-- ClassNotFoundException
+                   |-- RuntimeException
+                        |-- ArithmeticException
+                        |-- NullPointerException
+                        |-- ArrayIndexOutOfBoundsException
+                        |-- IllegalArgumentException
+                        |     |-- NumberFormatException
+                        |-- ClassCastException
+                        |-- IllegalStateException
+6. can compile multiple java class in one command: javac packagea/*.java packageb/*.java
+   if want to compile java file to class file and stored in another folder name classes: javac -d classes packagea/*.java packageb/*.java
 7. to run the class files in 6:
     java -cp classes packagea.nameOfOneClassFileWithoutExtension
     or
@@ -1672,3 +1695,313 @@
                       Then static block in side class Dog will be initialized
                       Then System.out.println() statement in main method will be called
                       Then new Dog(); new Dog(); makes no effect, because the rule above "This all happens at most once for each class!!"
+            final instance variables must assume the value by the time the constructor completes !
+            final local variables must have value only if used
+                        public class Item{
+                            private final double tax;
+                            private final double price;
+                            public Item(){
+                                this.price = 12.5;  //assignment in the constructor
+                            }
+                            { tax = 0.2 }  //assignment in the instance initializer
+                        }
+                        ==> This is OK, because the instance initializer is processed before constructor.
+                            but if we don't assign the value for tax and price, it will be compile error
+        Order of initialization when creating an instance
+            What happens when we initialize an instance of a class?
+                            Initialize the class if it was not already initialized (mentioned in the above section)
+                            If there is a superclass, initialize superclass
+                            Process all instance variable declarations
+                            Process all instance initializers
+                            Initialize the constructor
+            Example:
+                class Mammal{
+                    static { System.out.println("Hello!"); }
+                    { System.out.println("Good afternoon"); }
+                }
+                public class Dog extends Mammal{
+                    private String name = "Foden";
+                    { System.out.println("Name: " + name); }
+                    private static int i = 0;
+                    static { System.out.println(i); }
+                    {
+                        i++;
+                        System.out.println(i);
+                    }
+                    public Dog(){
+                        System.out.println("I am in the constructor of Dog class!");
+                    }
+                    public static void main(String[] args){
+                        System.out.println("I am the main one.");
+                        Dog dog = new Dog();
+                    }
+                }
+                //Output:
+                        Hello!
+                        0
+                        I am the main one.
+                        Good afternoon
+                        Name: Foden
+                        1
+                        I am in the constructor of Dog class!
+                //Explanation:
+                1. Because main() method inside Dog class, then class Dog will be initialized
+                    but Dog class has super class Mammal, so Mammal class will be initialized
+                2. static block in class Mammal will be executed first, then private static int i = 0; in the subclass
+                    will be executed second, then the static block in the subclass Dog will be executed.
+                3. then go back to the main() method, the System.out.println("I am the main one."); will be executed
+                4. then execute line Dog dog = new Dog(); so now follow `What happends when we initialize intance of a class`
+                    ,process all instance variable declarations, so private String name = "Foden" in subclass Dog will be processed
+                    ,then process all instance initializers, so initializer block { System.out.println("Good afternoon"); } in Mammal class will be processed
+                    ,then 2 initializer blocks in subclass will be processed { System.out.println("Name: " + name); } and   {
+                                                                                                                                i++;
+                                                                                                                                System.out.println(i);
+                                                                                                                            }
+                5. Finally, initialize the constructor, then the System.out.println("...") statement inside constructor will be executed.
+40. Inheriting Members
+        Inheriting Methods
+                subclass can override an inherited method
+                    subclass declares a new implementation for an inherited method
+                    with same signature (name & parameters)
+                    and covariant return type
+                the property of the object to take many different forms is called polymorphism
+                Example:
+                    class Mammal{
+                        public Mammal speak(){
+                            System.out.println("Mammal is making a sound.");
+                            return this;
+                        }
+                    }
+                    public class Dog extends Mammal{
+                        @Override  //This annotation is optional
+                        public Dog speak(){   //The return type of speak() method in class Mammal is Mammal,
+                                              //but the return type of the speak() method of Dog class is Dog.
+                                              //Both methods have different return type but it is method overriding. This is known as covariant return type
+                            System.out.println("Woof!");
+                            return this;
+                        }
+
+                        public static void main(String[] args) {
+                            Mammal mammal = new Mammal();
+                            Dog dog = new Dog();
+                            mammal.speak();
+                            dog.speak();
+                        }
+                    }
+                Method Overriding Rules: When you put the @Override, you need to follow the following rules
+                    Overriden method must have the same signature as superclass method
+                    Overriden method must be at least as accessible as the original method
+                        it means if method in super class is public, when you override you cannot make it less accessible by using protected => it's not allowed in Java
+                    Overriden method may not declare a checked exception that is new or broader than the one in original method
+                        it means if method in super class is explicitly declared will throws IOException,
+                            then in the method of subclass, we cannot explicit it to throws Exception, because Exception is broader than IOException
+                            but you can do explicit it to throws FileNotFoundException, because FileNotFoundException is subclass of IOException
+                    Return type of overriden method must be the same or a subtype of the return type of the original method (covariant return types)
+                Example:
+                    Case Exception:
+                        //checked exception FileNotFoundException is subclass of IOException
+                        class A{
+                            public void greet() throws IOException{}
+                            public void sayHello(){}
+                            public void leave(){} throws FileNotFoundException
+                        }
+                        public class B extends A{
+                            public void greet() throws FileNotFoundException //OK because FileNotFoundException is subclass of IOException
+                            public void sayHello(){} throws IOException //NOT OK, becasue the method in superclass isn't declared to throws any exception
+                            public void leave(){} throws IOException //NOT OK, because you are trying to declare a checked exception that is broader than the original one
+                        }
+                Overriding private and static methods
+                    If the method is private, it's not visible to other classes, if we have a private method in superclass
+                        then the method with same signature in subclass is independent of that method,
+                        means this is not overriding, it's just completely different method
+                    If the method is static, "overriden" method must also be declared static,
+                        and also actually this is "not overriding", since every method belongs to its own class
+                        this is called "hiding" the method
+                    Method marked as final cannot be overriden nor hidden
+                        Example:
+                            //hiding a static method
+                            class A{
+                                public static void greet() { System.out.println("Hello"); }
+                            }
+                            public class B extends A{
+                                public static void greet() { System.out.println("Good afternoon."); }  //Here if you don't declare greet() as static, it will be compile error
+
+                                public static void main(String[] args) {
+                                    A.greet(); //Output is: Hello.
+                                    B.greet(); //Output is: Good afternoon.
+                                }
+                            }
+                Variables cannot be overriden, only hidden
+                    class Mammal{
+                        public String name = "Unknown";
+                        public void greet(){
+                            System.out.println("Unknown greet method");
+                        }
+                    }
+                    public class Dog extends Mammal{
+                        public String name = "Rex";
+                        public void greet(){
+                            System.out.println("Rex greet method");
+                        }
+
+                        public static void main(String[] args) {
+                            Dog d = new Dog();
+                            Mammal m = d; // ~ Mammal m = new Dog();
+                            System.out.println(d.name); //Output is: Rex
+                            System.out.println(m.name); //Output is: Unknown
+                            d.greet(); //Output is: Rex greet method
+                            m.greet(); //Output is: Rex greet method  (why ? see keypoints below)
+                            //Key points:
+                                Variable Access: Determined by the reference type. `m.name` accesses name in Mammal
+                                Method Call: Determined by the actual object type at runtime. `m.greet()` calls the greet method in Dog
+                                             (because Mammal m = new Dog(), then m is pointing to object new Dog())
+                        }
+                    }
+41. Abstract Classes:
+        Classes which can be extended, but cannot be initialized
+            Example:
+                public abstract class Mammal {}  //Mammal is abstract class
+                public class Dog extends Mammal {}  //Dog is concrete class
+                Then
+                Dog dog = new Dog(); //OK
+                Mammal mdog = new Dog(): //OK
+                Mammal mammal = new Mammal(); //DOES NOT COMPILE, because abstract class cannot be initialized
+        Abstract methods, marked with abstract keyword, don't have a body, and the implementation (body) must be done in classes which extends an abstract class
+        Rules for Using abstract methods
+            Only instance methods can be marked abstract
+                not variables, constructors, static methods, etc.
+            Abstract method can only be declared in an abstract class
+            Non-abstract class which extends abstract class MUST implement ALL inherited methods
+            All other rules with overriding methods apply
+        Example:
+                abstract class Animal{
+                    public abstract void speak();
+                }
+                abstract class Mammal extends Animal{
+                    public abstract void walks(); //Mammal is also an abstract class, so it doesn't need to implement speak() method in abstract class Animal
+                }
+                public class Dog extends Mammal{ //Dog now must implement abstract method in both Animal and Mammal abstract classes
+                    @Override
+                    public void speak(){ System.out.println("Woof!"); }
+                    @Override
+                    public void walks(){ System.out.println("Dog walks"); }
+                    public static void main(String[] args){
+                        Dog dog = new Dog();
+                        dog.speak();
+                        dog.walks();
+                    }
+                }
+        Keep in mind...
+                abstract class can have constructors
+                    but they can be called only using super() from the child class (because abstract cannot be initialized, so there's no other way to do that)
+                abstract class or method cannot be marked final
+                abstract method cannot be marked private
+                static method cannot be overriden
+                    therefore, abstract static is not allowed
+42. Interfaces
+        a class can only extend one class
+        but can implement many interfaces (using keyword implements, separated by comma(,))
+            Example:
+                //Defining an interface
+                interface Animal{
+                    void eat(); //implicitly to be public
+                    void sleep(); //implicitly to be public
+                }
+                //Implement interface
+                class Dog implements Animal{
+                    public void eat(){ //Annotation @Override is optional, but keyword public here is required, because all abstract methods in interface are implicitly public,
+                                                                                                                and follow the rule when overriding method, the overriden method
+                                                                                                                must be at least as accessible as the original method. So here
+                                                                                                                the original method in interface is public, so when implementing
+                                                                                                                method you must declare public here
+                        System.out.println("Dot is eating");
+                    }
+                    public void sleep(){ //Annotation @Override is optional, but keyword public here is required, because all abstract methods in interface are implicitly public,
+                                                                                                                 and follow the rule when overriding method, the overriden method
+                                                                                                                 must be at least as accessible as the original method. So here
+                                                                                                                 the original method in interface is public, so when implementing
+                                                                                                                 method you must declare public here
+                        System.out.println("Dog is sleeping");
+                    }
+                }
+        Rules of implementation
+                Keyword public is required
+                Return type must be covariant with the interface method - Return type of overriden method must be the same or a subtype of the return type of the original method of interface
+                Signature (name & parameters) must match the interface method
+                All inherited methods must be implemented
+        An interface can extends another interface
+                Example:
+                    public interface Mammal{
+                        public int eats();
+                    }
+                    public interface canSwim extends Mammal{
+                        public int swim();
+                    }
+                    public class Elephant implements canSwim{
+                        public int swim() { return 5; }
+                        public int eats() { return -1; }
+                    }
+        Default Interface Methods
+                Image you have an interface which is implemented by 100 classes
+                For some reason you need to add another method in your interface
+                For this method were abstract, you would need to get back to the sourcecode, and implement it in all 100 classes
+                This is solved by making a method default (non-abstract)
+                Default method must have a body (default implementation)
+        Rules for Using Default Methods
+                Keyword default with a method can only be used in the interface
+                Has to have a body (default implementation)
+                Implicitly public
+                Default method cannot be abstract, final or static
+                Default method may or may not be overriden by a class implementing the interface
+                If the class inherits two or more default methods with the same method signature, then it must override the method
+                    Example:
+                        public interface Car{
+                            public default int getMaxSpeed(){
+                                return 100;
+                            }
+                        }
+                        public interface Truck{
+                            default int getMaxSpeed(){
+                                return 70;
+                            }
+                        }
+                        public class Van implements Car, Truck{
+                            public int getMaxSpeed(){ // We must override getMaxSpeed() because there are two of them with a same signature in interface Car and Truck also.
+                                return 80;
+                            }
+                            public int getMaxSpeedCar(){
+                                return Car.super.getMaxSpeed(); // This is how we call the default method from Car interface
+                            }
+                        }
+        Static interface methods
+            Example:
+                public interface Car{
+                    static int getMaxSpeed(){
+                        return 100;
+                    }
+                }
+                public class Ford implements Car{
+                    public int getMaxSpeedCar(){
+                        return Car.getMaxSpeed(); // This is how we call static method in interface Car
+                    }
+                }
+        Private interface methods
+            Example:
+                public interface Car{
+                    private static int calculateSpeed(){
+                        int speed = 70 * 2;
+                        return speed;
+                    }
+                    public default int getMaxSpeed(){
+                        return calculateSpeed(); //write a private method and then call private method in same interface to make code more readable
+                    }
+                    public default int getRecommendedSpeed(){
+                        return (int)(calculateSpeed() * 0.8); //write a private method and then call private method in same interface to make code more readable
+                    }
+                }
+        Rules for Using Private Methods
+                marked with keyword private
+                must have a body
+                private static methods may be called by any method in the same interface
+                non-static private methods may be called only by non-static methods
+        Default and private non-static methods can call abstract methods
