@@ -1,0 +1,145 @@
+42. Functional Interfaces and Lambdas
+            Functional Interface: 
+                    Is an interface which has exactly one abstract method
+          Can be annotated with @FunctionalInterface
+          Java provides many pre-defined functional interfaces such as Supplier, Consumer, Predicate, Function, etc.
+          Example 1:
+                            @FunctionalInterface   //This is optional annotation
+                            interface Animal{
+                    public void speak();
+              }
+                            class Dog implements Animal{
+                    public void speak() { System.out.println("Woof!"); }
+              }
+                    Example 2: Specific case that we don't need to create concrete class to implement the interface
+                @FunctionalInterface
+                interface Animal{
+                    public void speak();
+                }
+                            public class MyClass{
+                public static void main(String[] args){
+                  Animal dog = new Animal(){
+                    public void speak() { System.out.println("Woof!"); } //implement abstract method directly inside new object of class Animal
+                  }
+                }
+              }
+            Lambda Expression: 
+                    Let's do the same thing as example 2 above in lambda expression syntax
+                    Example:
+                        @FunctionalInterface
+                        interface Animal{
+                public void speak();
+            }
+                        public class MyClass{
+                public static void main(String[] args){
+                    Animal dog = () -> System.out.println("Woof!"); //in this case there's no input argument, so write () here
+                                                                                                                    //like arrow function in Javascript
+                                                                                                                    //after -> , if there are more than one statement, need to put inside block code {}
+                                                                                                                    //Remember, this statement is just to implement abstract metod
+                    dog.speak(); //use it to call the method speak() which is already implemented
+                }
+            }
+                    ==> Lambda provides the implementation of abstract method in a functional interface
+                Remember Lambda syntax only used with the functional interface because functional interface only have one abstract method
+              Remember class include lambda syntax don't need keyword implements, if so there will be compile error
+          Benefits of using lambda: You can see we don't need to create a class to implement interface
+                                                            and with lambda, it's very useful to provide different implementations in the same class
+                Example:
+                                    @FunctionalInterface
+                    interface Animal{
+                        public void speak();
+                    }
+                    public static void main(String[] args){
+                      Animal dogImplementation = () -> System.out.println("Woof!"); //implementation so it will not print out the System... 
+                      Animal catImplementation = () -> System.out.println("Meow!");
+                      Animal cowImplementation = () -> System.out.println("Moo!");
+                      dogImplementation.speak(); //Output is: Woof! 
+                      catImplementation.speak(); //Output is: Meow!
+                      cowImplementation.speak(); //Output is: Moo!
+                    }
+                    Using lambda incase abstract method have parameters and return type
+                Example:
+                                    FunctionalInterface
+                  interface Multiplicable{
+                        public int multiply(int a, int b);
+                  }
+                  public class MyClass{  //Don't write implements here, if so there will be compile error
+                        public static void main(String[] args){
+                        Multiplicable myImplementation = (a, b) -> a * b;
+                        int result = myImplementation.multiply(3, 4);
+                        System.out.println(result);
+                      }
+                  }
+                    Allowed variations in lambda syntax
+                one parameter
+                n -> 2 * n
+                                (n) -> 2 * n
+                (int n) -> 2 * n
+                n -> { return 2 * n; }
+                                (n) -> { return 2 * n; }
+                                (int n) -> { return 2 * n; }
+                            more parameters
+                                (a, b) -> a * b
+                                (int a, int b) -> a * b
+                (a, b) -> { return a * b; }
+                                (int a, int b) -> { return a * b; }
+                    Using `Predicate` with lambda           
+                Predicate
+                    Is a pre-defined functional interface provided by Java
+                        In order to use it java.util.function package must be imported
+                  Predicate has one abstract method that is test(T)
+                                which takes an argument of type T and returns boolean
+                      Predicate interface looks like
+                                        @FunctionalInterface
+                                        public interface Predicate<T>{
+                                                boolean test(T t);  //have only one abstract method test
+                                                // ...could have some other static and private methods here
+                                        }
+                  In order to use Predicate you have to implement test(T) method and then you can use it
+                        Example 1:
+                                                    import java.util.function.*;
+                                                    public class MyClass{
+                                public static void main(String[] args){
+                                    Predicate<Integer> gt10 = n -> n > 10;
+                                    System.out.println(gt10.test(7)); //Output is: false
+                                    System.out.println(gt10.test(12)); //Output is: true
+                              }
+                          }
+                        Example 2: tricky example
+                            import java.util.function.*;
+                                                    public class MyClass{
+                                static void myProbe(int n, Predicate<Integer> predicate){
+                                    if(predicate.test(n)){
+                                    System.out.println("The test has been passed.");
+                                  } else System.out.println("The test has been failed.");
+                              }
+                                public static void main(String[] args){
+                                    myProbe(4, predicate -> predicate >= 5); //Output is: The test has been failed.
+                                    myProbe(18, predicate -> predicate % 2 == 0); //Output is: The test has been passed.
+                                    
+                                    //can also like that
+                                    Predicate<Integer> myCriteriom = n -> n * n + 5 > 100; 
+                                    myProbe(2, myCriteriom);
+                              }
+                          }
+                    Method references: 
+                            Is a shorter way of writing lambda expression
+              Example: basic example
+                                    @FunctionalInterface
+                                    public interface Animal{
+                        public void speak(String s);
+                  }
+                                    public class MyClass{
+                        public static void main(String[] args){
+                            Normal way:  Animal myAnimal = s -> System.out.println(s); //normal way to write lambda expression
+                            //But the above line can be shorter by using method references
+                            Using method references way: Animal myAnimal = System.out::println;
+                            myAnimal.speak("Woof!"); //Output is: Woof!
+                      }
+                  }
+                            Method references and context
+                    Java already knows number of parameters of abstract method
+                        so they are automatically inserted without the need of explicitly list them
+                      for example: s -> System.out.println(s); ==> Java already know the abstract method speak() in Animal interface only have one parameter
+                                                                                                             so we can write like this: s -> System.out::println;
+                            Using method reference with static method, e.g Math.min()
