@@ -2150,3 +2150,339 @@
                         for example: s -> System.out.println(s); ==> Java already know the abstract method speak() in Animal interface only have one parameter
                                                                                                              so we can write like this: s -> System.out::println;
           Using method reference with static method, e.g Math.min()
+                Example 1:
+                      @FunctionalInterface
+                      interface Calculator{
+                            public int minimum(int a, int b);
+                      }
+                      public class MyClass{
+                            public static void main(String[] args){
+                                Normal way: Calculator lambda = (a, b) -> Math.min(a, b);
+                                //But the above line can be shorter by using method reference
+                                Using method references way: Calculator methodRef = Math::min;
+                                System.out.println(lambda.minimum(4, 2); //Output is: 2
+                                System.out.println(methodRef.minimum(4, 2): //Output is also: 2
+                            }
+                      }
+                Example 2:
+                      @FunctionalInterface
+                      interface Calculator{
+                            public double path(double t);
+                      }
+                      class Gravity{
+                            public static double freeFall(double t){
+                                final double g = 9.81;
+                                return 0.5 * g * t * t;
+                            }
+                      }
+                      public class MyClass{
+                            public static void main(String[] args){
+                                Normal way: Calculator lambda = t -> Gravity.freeFall(t);
+                                Using method references: Calculator methodRef = Gravity::freeFall;
+                                System.out.println(lambda.path(10));
+                                System.out.println(methodRef.path(10));
+                            }
+                      }
+          Calling method reference on an Object
+                @FunctionalInterface
+                interface Checker{
+                    public boolean check();
+                }
+                public class MyClass{
+                    public static void main(String[] args){
+                        String s = "Foden Duong";
+                        Normal way: Checker lambda = () -> s.isEmpty();
+                        Using method reference way: Checker methodRef = s::isEmpty;  //call method isEmpty() of object s
+                        System.out.println(methodRef.check());
+                    }
+                }
+          Calling method reference on a parameter
+                @FunctionalInterface
+                interface Checker{
+                    public boolean check(String s);
+                }
+                public class MyClass{
+                    public static void main(String[] args){
+                        Normal way: Checker lambda = s -> s.isBlank();
+                        Using method reference: Checker methodRef = String::isBlank; //method reference, must not write isBlank(), or isEmpty(),... must write isBlank, isEmpty,...
+                        System.out.println(methodRef.check("     ")); //Output is: true
+                    }
+                }
+          Calling constructor reference
+                @FunctionalInterface
+                interface Teller{
+                    String tellName(String name);
+                }
+                public class MyClass{
+                    public static void main(String[] args){
+                        Normal way: Teller lambda = s -> new String(s);
+                        Using method reference: Teller methodRef = String::new;
+                        System.out.println(lambda.tellName("Foden Duong"));
+                        System.out.println(methodRef.tellName("Foden Duong"));
+                    }
+                }
+          Summary some case of using method references
+                |           Lambda                  |           Method reference
+                |   s ->  System.out.println(s);    |   System.out::println
+                |   (a, b) -> Math.min(a, b)        |   Math::min
+                |   t -> Gravity.freeFall(t)        |   Gravity::freeFall
+                |   () -> s.isEmpty()               |   s::isEmpty
+                |   s -> s.isBlank()                |   String::isBlank
+                |   s -> new String(s)              |   String::new
+          Built-in Functional Interfaces
+                java.util.function package
+                        This package contains many built-in functional interfaces
+                        In order to use them, you have to know
+                            Name of the interface
+                            Signature of the abstract method
+                            Return type of the abstract method
+                        This leads to a paradigm usually referred to as functional programming
+                Most common Functional Interfaces
+                        |       Functional Interface    |       Method signature    |       Return type |
+                        |   Supplier<T>                 |   get()                   |   T               |
+                        |   Consumer<T>                 |   accept(T)               |   void            |
+                        |   BiConsumer<T, U>            |   accept(T, U)            |   void            |
+                        |   Predicate<T>                |   test(T)                 |   boolean         |
+                        |   BiPredicate<T, U>           |   test(T, U)              |   boolean         |
+                        |   Function<T, R>              |   apply(T)                |   R               |
+                        |   BiFunction<T, U, R>         |   apply(T, U)             |   R               |
+                        |   UnaryOperator<T>            |   apply(T)                |   T               |
+                        |   BinaryOperator<T>           |   apply(T, T)             |   T               |
+                Supplier
+                    @FunctionalInterface
+                    public interface Supplier<T>{
+                        T get();
+                    }
+                    Example:
+                            import java.util.function.*;
+                            import java.time.*;
+                            pulic class MyClass{
+                                public static void main(String[] args){
+                                    Supplier<LocalDateTime> dtImpl = () -> LocalDateTime.now();
+                                    System.out.println(dtImpl.get());  //prints out the local date time
+                                }
+                            }
+                Consumer, BiConsumer
+                    @FunctionalInterface
+                    public interface Consumer<T>{
+                        void accept(T t);
+                        //... This is how Consumer interface looks like, has only one abstract method accept(T t), and some of others non abstract
+                    }
+                    @FunctionalInterface
+                    public interface BiConsumer<T, U>{
+                        void accept(T t, U u);
+                        //... This is how BiConsumer interface looks like, has only one abstract method accept(T t), and some of others non abstract
+                    }
+                    Example:
+                        import java.util.function.*;
+                        public class MyClass{
+                            public static void main(String[] args){
+                                //Consumer
+                                Consumer<String> greet = s ->   System.out.println("Hello, " + s + "!");
+                                greet.accept("Foden Duong");
+
+                                //BiConsumer
+                                BiConsumer<String, Integer> p = (name, age) -> System.out.println(name + " is " + age + " years old.");
+                                p.accept("Foden", 25);
+                            }
+                        }
+                Predicate, BiPredicate
+                    @FunctionalInterface
+                    public interface Predicate<T>{
+                        boolean test(T t);
+                        //...
+                    }
+                    @FunctionalInterface
+                    public interface BiPredicate<T, U>{
+                        boolean test(T t, U u);
+                        //...
+                    }
+                    Example:
+                        import java.util.function.*;
+                        public class MyClass{
+                            public static void main(String[] args){
+                                //Predicate
+                                Predicate<Integer> predicate = n -> n > 10;
+                                System.out.println(predicate.test(7));
+
+                                //BiPredicate
+                                BiPredicate<Integer, Integer> biPredicate = (m, n) -> m > n;
+                                System.out.println(biPredicate.test(11, 9));
+                            }
+                        }
+                Function, BiFunction
+                    @FunctionalInterface
+                    public interface Function<T, R>{
+                        R apply(T t);
+                        //...
+                    }
+                    @FunctionalInterface
+                    public interface BiFunction<T, U, R>{
+                        R apply(T t, U u);
+                    }
+                    Example:
+                        import java.util.function.*;
+                        public class MyClass{
+                            public static void main(String[] args){
+                                //Function
+                                Function<Integer, Double> square = s -> (double) (n * n);
+                                var res = square.apply(5);
+                                System.out.println(res);
+
+                                //BiFunction
+                                BiFunction<String, Integer, String> con = (s, i) -> s + i;0
+                                System.out.println(con.apply("Foden's age is: ", 25);
+                            }
+                        }
+                UnaryOperator, BinaryOperator
+                    @FunctionalInterface
+                    public interface UnaryOperator<T> extends Function<T, T>{
+                        //...
+                    }
+                    @FunctionalInterface
+                    public interface BinaryOperator<T> extends BiFunction<T, T, T>{
+                        //...
+                    }
+                    Example:
+                        import java.util.function.*;
+                        public class MyClass{
+                            public static void main(String[] args){
+                                //UnaryOperator example
+                                UnaryOperator<Integer> negative = n -> -n;
+                                System.out.println(negative.apply(4)); //Output is: -4
+
+                                UnaryOperator<String> shout = String::toUpperCase; (~~ shout = s -> s.toUpperCase();)
+                                System.out.println(shout.apply("Foden")); //Output is: FODEN
+
+                                //BinaryOperator example
+                                BinaryOperator<Double> add = (a, b) -> a + b;
+                                System.out.println(add.apply(3.2, 4.0));
+
+                                BinaryOperator<String> con = String::concat;
+                                System.out.println(con.apply("Foden", " Duong")); //Output is: Foden Duong
+                            }
+                        }
+          Combining Implementations:
+                Helper Methods provided by FI's
+                    Consumer
+                            andThen()
+                    Function
+                            andThen()
+                            compose()
+                    Predicate
+                            and()
+                            or()
+                            negate()
+                Example 1: Consumer
+                        import java.util.function.*;
+                        public class MyClass{
+                            public static void main(String[] args){
+                                Consumer<String> greet1 = s -> System.out.println("Hello, " + s + "!");
+                                Consumer<String> greet2 = s -> System.out.println("Bye, " + s + "!");
+                                //First way
+                                Consumer<String> combinedGreet = greet1.andThen(greet2);
+                                combinedGreet.accept("Foden");
+                                //Second way
+                                greet1.andThen(greet2).accept("Foden");
+                            }
+                        }
+                Example 2: Function
+                        import java.util.function.*;
+                        public class MyClass{
+                            public static void main(String[] args){
+                                Function<Integer, Integer> square = n -> n * n;
+                                Function<Integer, Integer> triple = n -> 3 * n;
+                                Function<Integer, Integer> f1 = square.andThen(triple);
+                                Function<Integer, Integer> f2 = square.compose(triple);
+                                System.out.println(f1.apply(5)); //Output is: 75 (5 x 5 = 25, then 3 * 25 = 75)
+                                System.out.println(f2.apply(5)); //Output is: 225 ((3 * 5) * (3 * 5) = 225, that means for a given integer we are first tripling it and then we square the result)
+                            }
+                        }
+                Example 3: Predicate
+                        import java.util.function.*;
+                        public class MyClass{
+                            public static void main(String[] args){
+                                Predicate<Integer> gt10 = n -> n > 10;
+                                Predicate<Integer> lt20 = n -> n < 20;
+                                Predicate<Integer> p1 = gt10.and(lt20);
+                                Predicate<Integer> p2 = gt10.or(lt20);
+                                Predicate<Integer> p3 = lt20.negate(); //negate here means negative, p3.test(5) will return false because 5 less than 20, so it's correct and so it does not negate
+                                System.out.println(p1.test(5) + " " + p2.test(5) + " " + p3.test(5)); //Output is: false true false
+                            }
+          Functional Interfaces for Primitives
+                |       Functional Interface        |       Return Type     |       Abstract Method Signature
+                |   BooleanSupplier                 |   boolean             |   getAsBoolean()
+                |   DoubleSupplier                  |   double              |   getAsDouble()
+                |   IntSupplier                     |   int                 |   getAsInt()
+                |   LongSupplier                    |   long                |   getAsLong()
+                |   DoubleConsumer                  |   void                |   accept(double a)
+                |   IntConsumer                     |   void                |   accept(int a)
+                |   LongConsumer                    |   void                |   accept(long value)
+                |   DoublePredicate                 |   boolean             |   test(double value)
+                |   IntPredicate                    |   boolean             |   test(int value)
+                |   LongPredicate                   |   boolean             |   test(long value)
+                |   DoubleFunction<R>               |   R                   |   apply(double value)
+                |   IntFunction<R>                  |   R                   |   apply(int value)
+                |   LongFunction<R>                 |   R                   |   apply(long value)
+                |   DoubleUnaryOperator             |   double              |   applyAsDouble(double value)
+                |   IntUnaryOperator                |   int                 |   applyAsInt(int value)
+                |   LongUnaryOperator               |   long                |   applyAsLong(long value)
+                |   DoubleBinaryOperator            |   double              |   applyAsDouble(double v, double w)
+                |   IntBinaryOperator               |   int                 |   applyAsInt(int v, int w)
+                |   LongBinaryOperator              |   long                |   applyAsLong(long v, long w)
+                |   ToDoubleFunction<T>             |   double              |   applyAsDouble(T t)
+                |   ToIntFunction<T>                |   int                 |   applyAsInt(T t)
+                |   ToLongFunction<T>               |   long                |   applyAsLong(T t)
+                |   ToDoubleBiFunction<T, U>        |   double              |   applyAsDouble(T t, U u)
+                |   ToIntBiFunction<T, U>           |   int                 |   applyAsInt(T t, U u)
+                |   ToLongBiFunction<T, U>          |   long                |   applyAsLong(T t, U u)
+                |   DoubleToIntFunction             |   int                 |   applyAsInt(double value)
+                |   DoubleToLongFunction            |   long                |   applyAsLong(double value)
+                |   IntToDoubleFunction             |   double              |   applyAsDouble(int value)
+                |   IntToLongFunction               |   long                |   applyAsLong(int value)
+                |   LongToDoubleFunction            |   double              |   applyAsDouble(long value)
+                |   LongToIntFunction               |   int                 |   applyAsInt(long value)
+                |   ObjDoubleConsumer<T>            |   void                |   accept(T t, double value)
+                |   ObjIntConsumer<T>               |   void                |   accept(T t, int value)
+                |   ObjLongConsumer<T>              |   void                |   accept(T t, long value)
+44. Collections
+        Common Collection Methods
+                These interfaces are commonly referred to as collections
+                        List, Set, Queue(Deque), Map
+                Classes which implement these above interfaces
+                        Interfaces `List`, `Set`, and `Queue` extend interface `Collection`
+                        Class `ArrayList` implements interface `List`
+                        Classes `HashSet`, and `TreeSet` implement interface `Set`
+                        Interface `Deque` implements interface `Queue`
+                        Class `LinkedList` implements interfaces `Queue`, and `List`
+                        Interface `Map` doesn't implement interface `Collection` (but nevertheless we refer to Maps as collections because they behave very similarly to classes
+                                                                                  and interfaces which actually implement the interface `Collection`)
+                        Classes `HashMap`, and `TreeMap` implement `Map` interface
+
+                                                                                +-----------------------+
+                                                                                |      Collection       |
+                                                                                |      (Interface)      |
+                                                                                +-----------+-----------+
+                                                                                            |
+                                                                        +-------------------+------------------+
+                                                                        | extends           | extends          | extends
+                                                            +---------------+        +---------------+   +-------------------+
+                                                            |(Interface)List|        |(Interface)Set |   | (Interface) Queue |
+                                                            +---------------+        +---------------+   +-------------------+
+                                                                        | implements        | implements       | extends
+                                                                 +-----------------+  +---------------+   +-------------------+
+                                                                 |(Class)ArrayList |  |(Class) HashSet|   | Deque (Interface) |
+                                                                 |(Class)LinkedList|  |(Class) TreeSet|   +-------------------+
+                                                                 +-----------------+  +---------------+        |
+                                                                                                               | implements
+                                                                                                     +-------------------+
+                                                                                                     |(Class) LinkedList |
+                                                                                                     +-------------------+
+                                                        ==========================================================================
+                                                                                +--------------------+
+                                                                                |    Map(Interface)  |
+                                                                                +--------------------+
+                                                                            implements/              \implements
+                                                                       +-----------------+      +-----------------+
+                                                                       | HashMap (Class) |      | TreeMap (Class) |
+                                                                       +-----------------+      +-----------------+
