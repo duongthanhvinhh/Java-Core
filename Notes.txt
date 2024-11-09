@@ -2486,3 +2486,187 @@
                                                                        +-----------------+      +-----------------+
                                                                        | HashMap (Class) |      | TreeMap (Class) |
                                                                        +-----------------+      +-----------------+
+                add() method: adds an element in the collection, returns true or false
+                        Example:
+                            Collection<String> names = new ArrayList<>();
+                            System.out.println(names.add("John")); //Output is: true
+                            System.out.println(names.add("John")); //Output is: true
+                            but
+                            Collection<String>names = new HashSet<>();
+                            System.out.println(names.add("Foden")); //Output is: true
+                            System.out.println(names.add("Foden")); //Output is: false (Because Set doesn't allow duplicates)
+                remove() method: removes an element in the collection, returns true or false
+                        Example:
+                            Collection<String> names = new ArrayList<>();
+                            names.add("Foden");
+                            names.add("Duong");
+                            names.add("Foden");
+                            System.out.println(names); //Output is: [Foden, Duong, Foden]
+                            System.out.println(names.remove("Foden")); //Output is: true
+                            System.out.println(names); //Output is: [Duong, Foden] (only the first match is removed by the above line)
+                            System.out.println(names.remove("Lukaku")); //Output is: false (since there's no element Lukaku in the collection)
+                isEmpty() method:
+                        Example:
+                            Collection<String> names = new ArrayList<>();
+                            System.out.println(names.isEmpty()); //Output is: true
+                size() method:
+                        Example:
+                            Collection<String> names = new ArrayList<>();
+                            names.add("Foden");
+                            names.add("Duong");
+                            names.add("Foden");
+                            System.out.println(names.size()); //Output is: 3
+                clear() method: Removes all elements from the collection
+                        Example:
+                            Collection<String> names = new ArrayList<>();
+                            names.add("Foden");
+                            names.add("Duong");
+                            names.add("Foden");
+                            name.clear();
+                            System.out.println(names.size()); //Output is: 0
+                contains() method: Check if the collection contains an element or not and returns true or false
+                        Example:
+                            Collection<String> names = new ArrayList<>();
+                            names.add("Foden");
+                            names.add("Duong");
+                            names.add("Foden");
+                            System.out.println(names.contains("Duong")); //Output is: true
+                            System.out.println(names.contains("Vinh")); //Output is: false
+                removeIf() method: Removes elements with condition
+                        Example:
+                            Collection<String> names = new ArrayList<>();
+                            names.add("Foden");
+                            names.add("Vinh");
+                            names.removeIf(s -> s.length() > 4);
+                            System.out.println(names); //Output is: [Vinh]
+                forEach() method:
+                        Example:
+                            Collection<String> names = new ArrayList<>();
+                            names.add("Foden");
+                            names.add("Duong");
+                            names.add("Vinh");
+                            names.forEach(name -> System.out.print(name + ", ")); //Output is: Foden, Duong, Vinh
+        List interface:
+                List is an ordered collection which can contain duplicate entries
+                Items can be reached and inserted using the index (int)
+                Unlike array, List  can change in size after being declared
+                There are two classes which implement List interface: ArrayList and LinkedList
+                    ArrayList  is better when you read more than you write
+                    LinkedList implements both List and Deque interface
+                Creating a List using factory methods:
+                        Arrays.asList(varargs)
+                                fixed size list, can modify value of elements, but cannot add or remove element because the size is fixed
+                                is backed by the array, means any changes in the array will be reflected to the list
+                                Example:
+                                        String[] names = new String[] {"Foden", "Duong", "Vinh"};
+                                        List<String> list = Arrays.asList(names);
+                                        names[1] = "Micheal";
+                                        System.out.println(list); //Output is: [Foden, Micheal, Vinh] (changes in array names, will be reflected to the array list)
+                                        list.set(2, "Phil"); //OK
+                                        System.out.println(list); //Output is: [Foden, Micheal, Phil]
+                                        Also
+                                        System.out.pritln(Arrays.toString(names)); //Output is: [Foden, Micheal, Phil] (so can see the changes in list will be also reflected back to array
+                                                                                                                        so we can say Backing up works both ways)
+                                        list.add("Micheal"); //throws UnsupportedOperationException
+                                        list.remove("Foden"); //throws UnsupportedOperationException
+                        List.of(varargs)
+                                returns immutable list, cannot change value of elements also cannot add or remove element
+                                Example:
+                                        String[] names = new String[] {"Foden", "Duong", "Vinh"};
+                                        List<String> list = List.of(names);
+                                        names[1] = "Micheal";
+                                        System.out.println(list); //Output is: [Foden, Duong, Vinh] (changes in array names, will NOT be reflected to array)
+                                        list.set(1, "Phil"); //throws UnsupportedOperationException
+                                        list.add("Micheal"); //throws UnsupportedOperationException
+                                        list.remove("Foden"); //throws UnsupportedOperationException
+                        List.copyOf(collection)
+                                immutable list with copy of original values
+                                Example:
+                                        List<String> originalList = new ArrayList<>(Arrays.asList("Foden", "Duong", "Vinh"));
+                                        List<String> copyList = List.copyOf(originalList);
+                                        copyList.set(1, "Phil"); //throws UnsupportedOperationException
+                                        copyList.add("Micheal"); //throws UnsupportedOperationException
+                                        copyList.remove("Foden"); //throws UnsupportedOperationException
+                                        but
+                                        originalList.set(1, "Phil"); //OK
+                                        originalList.add("Micheal"); //OK
+                                        originalList.remove("Foden"); //Also OK, because originalList is declared as List<String> originalList = new ArrayList<>(...);
+                        ==> List created by a factory method has a fixed size!
+                Creating a List with a constructor:
+                        Example:
+                                List<String> myList = new ArrayList<>();
+                            Also
+                                ArrayList<String> myArrList = new ArrayList<>();
+                            Also
+                                ArrayList<String> myArrList = new ArrayList<>(5); //Add 5 here to tell the compiler that we want to reserve 5 slots,
+                                                                                  //for size of arrList, but you can add more later, the size will automatically increase
+                List Methods:
+                        add(E element)
+                        add(int index, E element)
+                        get(int index)
+                        remove(int index)
+                        remove(E element)
+                        replaceAll(UnaryOperator<E> op)
+                        set(int index, E element) //update value of element
+                        sort(Comparator<? super E> c)
+                    Example:
+                            List<String> names = new ArrayList<>();
+                            names.add("Foden");
+                            names.add("Vinh");
+                            names.add("Phil");
+                            System.out.println(names); //Output is: [Foden, Vinh, Phil]
+                            names.add(1, "Duong");
+                            System.out.println(names); //Output is: [Foden, Duong, Vinh, Phil]
+                            System.out.println(names.get(0)); //Output is: Foden
+                            names.set(2, "Micheal");
+                            System.out.println(names); //Output is: [Foden, Duong, Micheal, Phil]
+                            names.remove(2);
+                            names.remove("Foden");
+                            System.out.println(names); //Output is: [Duong, Phil]
+                            names.replaceAll(s -> "Mr. " + s);
+                            ystem.out.println(names); //Output is: [Mr. Duong, Mr. Phil]
+                    two ways of using remove() method
+                            Example:
+                                    List<Integer> nums = new ArrayList<>();
+                                    nums.add(2);
+                                    nums.add(-21);
+                                    nums.add(7);
+                                    nums.remove(2); //Will remove element at index 2, which is 7
+                                    nums.remove(Integer.valueOf(2)); //Will remove element has value 2, which is element at index 0
+                                    ==> If we pass the argument type primitive, remove(int index) will be called
+                                        If we pass the argument type Object , not primitive, remove(E element) will be called
+                Converting List to Array using toArray() method
+                            Example:
+                                    List<Integer> myList = new ArrayList<>();
+                                    myList.add(3);
+                                    myList.add(7);
+                                    myList.add(5);
+                                    Object[] objArray = myList.toArray();
+                                Or
+                                    Integer[] intArray = myList.toArray(new Integer[0]); //Define 0 as default size of array, if list has more than 0 element,
+                                                                                         //then array size will follow size of list
+        Set interface:
+                Doesn't allow duplicate entries
+                Doesn't allow to find element by index (that means we don't have get() method for Set interface)
+                Implementation: HashSet, TreeSet
+                HashSet: stores(key, value) elements in hash table
+                        key is hashCode(), value is Object
+                        doesn't keep the order of elements
+                        adding each element takes the same time
+                TreeSet: stores elements in a sorted tree structure, it doesn't use (key, value) pair, it uses a tree structure
+                        keep the order of elements
+                        adding each element takes more time as tree goes bigger
+                Example: HashSet
+                        Set<String> names = new HashSet<>();
+                        System.out.println(names.add("Foden")); //Output is: true
+                        System.out.println(names.add("Duong")); //Output is: true
+                        System.out.println(names.add("Foden")); //Output is: false (because we are adding duplicated entry)
+                        System.out.println(names.add("Vinh")); //Output is: true
+                        System.out.println(names); //Output is: [Duong, Foden, Vinh] (arbitrary order - Unpredictable, the order of elements may be changed in each runtime)
+                Example: TreeSet
+                        Set<String> names = new TreeSet<>();
+                        System.out.println(names.add("Foden")); //Output is: true
+                        System.out.println(names.add("Duong")); //Output is: true
+                        System.out.println(names.add("Foden")); //Output is: false
+                        System.out.println(names.add("Vinh")); //Output is: true
+                        System.out.println(names); //Output is: [Duong, Foden, Vinh] (keeps order in String alphabetical order)
