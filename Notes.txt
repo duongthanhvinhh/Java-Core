@@ -2670,3 +2670,104 @@
                         System.out.println(names.add("Foden")); //Output is: false
                         System.out.println(names.add("Vinh")); //Output is: true
                         System.out.println(names); //Output is: [Duong, Foden, Vinh] (keeps order in String alphabetical order)
+        Queue interface:
+                Implemented by LinkedList Class
+                Adds element in the back, reads from the front (every element is added at the back of the queue, but reading is done from the front of the queue)
+                        This principle is called: FIFO - First In First Out
+                Some proper methods:
+                        peek(): is used to read the element from the front
+                        offer(E e): puts element on the back
+                        poll(): removes element from the front
+                Some methods inherited from Collection:
+                        element()
+                        add(E e)
+                        remove()
+                ==> We can use either peek() or element, offer(E e) or add(E e), poll() or remove() to do the same thing
+                    Only thing difference here is:
+                            In the case of unsuccessful operation, peak() and poll() return null on empty queues, offer(E e) returns false if it fails to add due to capacity restrictions
+                            while the Collection methods throw the exception
+                Example 1: LinkedList with reference type is Queue
+                        Queue<String> colors = new LinkedList<>();
+                        colors.offer("blue");
+                        colors.offer("green");
+                        colors.offer("red");
+                        colors.offer("yellow");
+                        System.out.println(colors); //Output is: [blue, green, red, yellow]
+                        System.out.println(colors.peek()); //Output is: blue (get first element)
+                        colors.poll(); //remove first element
+                        System.out.println(colors); //Output is: [green, red, yellow]
+                        System.out.println(colors.peek()); //Output is: green (get first element)
+                Example 2: LinkedList with reference type is Deque
+                        Deque<String> list = new LinkedList<>();
+                        list.add("Foden");
+                        list.add("Duong");
+                        list.add("Vinh");
+                        list.addFirst("Micheal");
+                        list.addLast("Phil");
+                        System.out.println(list.getFirst());
+                        System.out.println(list.getLast());
+                        list.removeFirst();
+                        list.removeLast();
+                        list.remove("Foden");
+                Example 3: LinkedList with reference type is List interface - NOT support addFirst(), addLast(), getFirst(), getLast(), removeFirst(), and removeLast()
+        Deque interface:
+                Implemented by LinkedList and ArrayQueue
+                Adds element in the front, but reads from the back - Works as a Stack
+                        This principle is called: LIFO - Last In First Out
+                Example 1: ArrayDeque with reference type Deque
+                        Deque<String> colors = new ArrayDeque<>();
+                        colors.push("blue");
+                        colors.push("green");
+                        colors.push("red");
+                        colors.push("yellow");
+                        System.out.println(colors); //Output is: [yellow, red, green, blue] (LIFO so yellow is last added, then showed first)
+                        System.out.println(colors.peek()); //Output is: yellow
+                        colors.pop(); //Remove first element, which is the last one was added
+                        System.out.println(colors.peek()); //Output is: red
+                        colors.pop();
+                        colors.pop();
+                        colors.pop();
+                        System.out.println(colors.peek()); //Output is: null
+                Example 2: LinkedList with reference type Deque
+                        Deque<Integer> nums = new LinkedList<>();
+                        nums.addFirst(9);
+                        nums.offerFirst(-11);
+                        nums.addLast(5);
+                        System.out.println(nums); //Output is: [-11, 9, 5]
+                        System.out.println(nums.getFirst()); //Output is: -11
+                        System.out.println(nums.peekLast()); //Output is: 5
+                        nums.pollFirst();
+                        System.out.println(nums); //Output is [9, 5]
+                        System.out.println(nums.getFirst()); //Output is: 9
+                        System.out.println(nums.peekLast()); //Output is: 5
+        Deque Interface as Double-Ended Queue
+                    Here is a complete list of Deque methods for reference:
+                            Queue-like Methods:
+                                    add(E e)
+                                    offer(E e)
+                                    remove()
+                                    poll()
+                                    element()
+                                    peek()
+                            Deque-specific Methods:
+                                    addFirst(E e)
+                                    addLast(E e)
+                                    offerFirst(E e)
+                                    offerLast(E e)
+                                    removeFirst()
+                                    removeLast()
+                                    pollFirst()
+                                    pollLast()
+                                    getFirst()
+                                    getLast()
+                                    peekFirst()
+                                    peekLast()
+        Map Interface
+                Collection which stores (key, value) pairs
+                Two implementations of Map interface:
+                        HashMap:
+                                order doesn't matter
+                                same amount of time to add and get element
+                        TreeMap:
+                                order is preserved
+                                takes more time to add elements as map goes bigger
