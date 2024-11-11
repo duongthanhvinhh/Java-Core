@@ -2330,7 +2330,7 @@
                                 System.out.println(res);
 
                                 //BiFunction
-                                BiFunction<String, Integer, String> con = (s, i) -> s + i;0
+                                BiFunction<String, Integer, String> con = (s, i) -> s + i;
                                 System.out.println(con.apply("Foden's age is: ", 25);
                             }
                         }
@@ -2771,3 +2771,89 @@
                         TreeMap:
                                 order is preserved
                                 takes more time to add elements as map goes bigger
+                Example:
+                        Map<Integer, String> names = Map.of(1, "Foden", 2, "Duong", 3, "Vinh");
+                        System.out.println(names); //Output is: {1=Foden, 2=Duong, 3=Vinh}
+
+                        //Another way
+                        Map<Integer, String> names = new HashMap<>(); //create an empty map
+                        names = Map.ofEntries(
+                            Map.entry(1, "Foden"),
+                            Map.entry(2, "Duong",
+                            Map.entry(3, "Vinh"));
+                        System.out.println(names); //Output is: {3=Vinh, 1=Foden, 2=Duong} (in HashMap the order is not preserved, so basically
+                                                                                            you don't know in which order this will be printed out)
+                Map Methods:
+                        clear(): clears the map
+                        containsKey(Object key): checks if the key is in the map
+                        containsValue(Object value): checks if the value is in the map
+                        entrySet(): returns Set of key/value pairs
+                        forEach(): loops through key/value pairs
+                        get(Object key): returns value mapped with key, or null if none exists
+                        getOrDefault(Object key, V defaultValue): same as get, but returns defaultValue if key doesn't exist
+                        isEmpty(): checks if map is empty
+                        keySet(): returns Set of all keys
+                        merge(K key, V value, BiFunction(<V, V, V> func): sets value if key doesn't exists, runs func if key is set to determine new value
+                                                                          removes if value is null
+                        put(K key, V value): adds or replaces k/v pair, returns previous value or null
+                        putIfAbsent(K key, V value): if key not present, adds value and returns null (otherwise, returns the existing value)
+                        remove(Object key): removes and returns value mapped to key, or null if none exists
+                        replace(K key, V value): replaces value for given key if key is set, returns original value or null if none exists
+                        replaceAll(BiFunction<K, V, V> func): replaces each value with results of function
+                        size(): returns number of k/v pairs in the map
+                        values(): returns Collection of values
+                    Example:
+                        Map<Integer, String> names = new HashMap<>();
+                        names.put(5, "Foden");
+                        names.put(11, "Duong");
+                        names.put(-2, "Vinh");
+                        String myName = names.get(-2);
+                        System.out.println(myName); //Output is: Vinh
+
+                        //loop over all keys
+                        for (Integer key : names.keySet()){
+                            System.out.println("Key: " + key + ", Value: " + names.get(key));
+                        }
+
+                        //using forEach()
+                        names.forEach((k, v) -> System.out.println("Key: " + key + ", Value: " + names.get(key));
+
+                        //just values
+                        names.values().forEach(System.out::println);
+
+                        //using entrySet()
+                        names.entrySet().forEach(e -> System.out.println("Key: " + e.getKey() + ", Value: " + e.getValue()));
+
+                        //using getOrDefault()
+                        System.out.println(names.getOrDefault(-3, "Name not found"));
+
+                        //using replace()
+                        String myName = names.replace(-2, "Phil"); //replaces value on key = -2 with Phil, but also returns the old value = Vinh
+                        System.out.println(myName); //So that output is Vinh
+
+                        //putIfAbsent()
+                        names.putIfAbsent(7, "Micheal");
+                        names.putIfAbsent(-2, "John"); //will not execute put, because the key -2 already exists
+
+                        //merge()
+                        Map<Integer, String> names = new HashMap<>();
+                        names.put(5, "Foden");
+                        names.put(11, "Duong");
+                        names.put(-2, "Vinh");
+                            => want to insert name only if it is longer than the original name
+                        BiFunction<String, String, String> myLogic = (name1, name2) -> name1.length() > name2.length() ? name1 : name2;
+                        System.out.println(names.merge(5, "FodenD", myLogic));
+                Sorting data in a collection
+                        We are already partly familiar with sort() method
+                        If elements in the collection are primitives, they are sorted by natural order
+                        If elements are Strings, then numbers sort before letters, and uppercase letters sort before lowercase letters
+                        But elements in the collection can be any type of object, in that case we have to define our own criteria of sorting
+                        In order to do this we can choose one of two approaches
+                                Use a class which implements Comparable<T> interface, or
+                                Pass the implementation of Comparator<T> interface in sort() method
+                        Comparable<T> interface
+                                This interface has one abstract method: int compareTo(T o), this methods has to be implemented in a concrete class.
+                                        this method returns an integer according to these rules:
+                                                If the current object is equivalent to the argument it returns 0
+                                                If the current object is smaller than the argument it returns a negative number
+                                                If the current object is larger than the argument it returns a positive number
