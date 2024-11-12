@@ -2857,3 +2857,125 @@
                                                 If the current object is equivalent to the argument it returns 0
                                                 If the current object is smaller than the argument it returns a negative number
                                                 If the current object is larger than the argument it returns a positive number
+                                Example 1: define Person objects will be sorted by age
+                                        public class Person implements Comparable<Person>{
+                                            private String name;
+                                            private int age;
+                                            public Person(String name, int age){
+                                                this.name = name;
+                                                this.age = age;
+                                            }
+                                            @Override
+                                            public int compareTo(Person other){
+                                                return this.age - other.age;
+                                            }
+                                            //toString() implementation
+                                        }
+                                        public class Main{
+                                            public static void main(String[] args){
+                                                List<Person> people = Arrays.asList(
+                                                    new Person("Foden", 25),
+                                                    new Person("Duong", 30),
+                                                    new Person("Vinh", 35)
+                                                );
+                                                Collections.sort(people);
+                                                System.out.println(people);
+                                                //Output is like below:
+                                                  [
+                                                    Person{name='Foden', age=25},
+                                                    Person{name='Duong', age=30},
+                                                    Person{name='Vinh', age=35}
+                                                  ]
+                                                ===> because List<Person> is a list of objects, if we do not implement Comparable, and override compareTo(Person other) method
+                                                     to define how Person objects should be compared, when using Collections.sort(people), you will get error
+                                                            Exception in thread "main" java.lang.ClassCastException: Person cannot be cast to java.lang.Comparable
+                                                            at java.util.ComparableTimSort.countRunAndMakeAscending(ComparableTimSort.java:320)
+                                                            at java.util.ComparableTimSort.sort(ComparableTimSort.java:188)
+                                                            at java.util.Arrays.sort(Arrays.java:1312)
+                                                            at java.util.Collections.sort(Collections.java:223)
+                                                            at Main.main(Main.java:10)
+                                            }
+                                        }
+                                Example 2: define Person objects will be sorted by name
+                                        public class Person implements Comparable<Person>{
+                                            private String name;
+                                            private int age;
+                                            public Person(String name, int age){
+                                                this.name = name;
+                                                this.age = age;
+                                            }
+                                            @Override
+                                            public int compareTo(Person other){
+                                                return this.name.compareTo(other.name);
+                                            }
+                                        }
+                                        public class Main{
+                                            public static void main(String[] args){
+                                                List<Person> people = Arrays.asList(
+                                                    new Person("Foden", 25),
+                                                    new Person("Duong", 30),
+                                                    new Person("Vinh", 35)
+                                                );
+                                                Collections.sort(people);
+                                                System.out.println(people);
+                                                //Output is like below:
+                                                  [
+                                                    Person{name='Duong', age=30},
+                                                    Person{name='Foden', age=25},
+                                                    Person{name='Vinh', age=35}
+                                                  ]
+                                                ===> because List<Person> is a list of objects, if we do not implement Comparable, and override compareTo(Person other) method
+                                                     to define how Person objects should be compared, when using Collections.sort(people), you will get error
+                                                            Exception in thread "main" java.lang.ClassCastException: Person cannot be cast to java.lang.Comparable
+                                                            at java.util.ComparableTimSort.countRunAndMakeAscending(ComparableTimSort.java:320)
+                                                            at java.util.ComparableTimSort.sort(ComparableTimSort.java:188)
+                                                            at java.util.Arrays.sort(Arrays.java:1312)
+                                                            at java.util.Collections.sort(Collections.java:223)
+                                                            at Main.main(Main.java:10)
+                                            }
+                                        }
+                        Comparator<T> interface
+                                Compared to 2 examples above, we need to define a criterium for sorting when designing a class Person (either by name or age)
+                                What if we want to sort by name in one case, and by age in another ? That's when you may think about Comparator<T> interface
+                                        and provide the implementation for compare(T o1, T o2) method
+                                        this implementation is than passed to sort() method, to do this we usually use lambda expression or method reference
+                                Example:
+                                        public class Person{
+                                            private String name;
+                                            private int age;
+                                            public Person(String name, int age){
+                                                this.name = name;
+                                                this.age = age;
+                                            }
+                                            public String getName() {return name};
+                                            public int getAge() {return age};
+                                        }
+                                        public class Main{
+                                            public static void main(String[] args){
+                                                List<Person> people = Arrays.asList(
+                                                    new Person("Foden", 30),
+                                                    new Person("Phil", 25),
+                                                    new Person("Vinh", 35)
+                                                );
+                                                //To sort by age using Comparator<T> interface
+                                                    Collections.sort(people, (p1, p2) -> p1.getAge() - p2.getAge());
+                                                or another way to write the same code above
+                                                    Comparator<Person> byAge = (Person p1, Person p2) -> p1.getAge() - p2.getAge();
+                                                    Collections.sort(people, byAge);
+                                                //To sort by name using Comparator<T> interface
+                                                    Collections.sort(people, (p1, p2) -> p1.getName().compareTo(p2.getName()));
+                                                //To sort by name using comparing() method with method reference
+                                                    Comparator<Person> c = Comparator.comparing(Person::getName);
+                                                //To sort by name using comparing() method with method reference but in reversed order
+                                                    Comparator<Person> c = Comparator.comparing(Person::getName).reversed;
+                                                //To sort by name and then by age (if names are the same)
+                                                    Comparator<Person> c = Comparator.comparing(Person::getName).thenComparingInt(Person::getAge);
+                                            }
+                                        }
+                        Comparable vs Comparator in summary
+                                |                                 |   Comparable                      |   Comparator                  |
+                                |  package name (for import)      |   java.lang                       |   java.util                   |
+                                |  must be implemented by a class |   Yes                             |   No                          |
+                                |  method name in interface       |   compareTo()                     |   compare()                   |
+                                |  number of method parameters    |   1                               |   2                           |
+                                |  usually used with lambda       |   No                              |   Yes                         |
