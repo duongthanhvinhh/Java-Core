@@ -4,21 +4,21 @@
 3. java FodenClass "Foden" Foden  => input "Foden" or Foden can both be ok with java runtime
 4. import java.util.* will import all classes under java.util, but not import subfolder of util folder
 5. Errors and Exceptions overview in Java:
-            Throwable
-              |-- Error
+            Throwable (java.lang.Throwable)
+              |-- Error (java.lang.Error) => also called unchecked exceptions
               |     |-- LinkageError
               |     |     |-- ClassNotFoundError
               |     |     |-- NoClassDefFoundError
               |     |-- VirtualMachineError
               |           |-- OutOfMemoryError
               |           |-- StackOverflowError
-              |-- Exception
+              |-- Exception (java.lang.Exception)
                    |-- IOException
                    |     |-- FileNotFoundException
                    |     |-- EOFException
                    |-- SQLException
                    |-- ClassNotFoundException
-                   |-- RuntimeException
+                   |-- RuntimeException (java.lang.RuntimeException) => also called unchecked exceptions
                         |-- ArithmeticException
                         |-- NullPointerException
                         |-- ArrayIndexOutOfBoundsException
@@ -2979,3 +2979,140 @@
                                 |  method name in interface       |   compareTo()                     |   compare()                   |
                                 |  number of method parameters    |   1                               |   2                           |
                                 |  usually used with lambda       |   No                              |   Yes                         |
+45. Exceptions
+        Exceptions occurs when something goes wrong during the runtime, e.g
+                You are trying to divide by zero
+                You are trying to fetch the index of the array which does not exist
+                You are trying to use null as a reference
+                You are passing a value to a method which is not internally allowed
+                You are trying to reach the file which does not exist
+                You are trying to connect to a database which is not accessible
+        Checked Exception
+                Must be declared or handled by the application code where it is thrown
+                All checked exceptions inherit Exception, but not RuntimeException
+                Checked exception is declared when defining a method
+                    using keyword throws
+                Checked exception is handled using try-catch block
+
+
+                ............................................................
+                ............................................................
+                Catching multiple exceptions
+                        Example 1: One exception is a subclass of another
+                                void readFirstByteFromFile(File fileName){
+                                    try {
+                                        FileInputStream file = new FileInputStream(fileName);
+                                        byte x = (byte) file.read();
+                                        System.out.println(x);
+                                    } catch (FileNotFoundException e) {  //subclass
+                                        e.printStackTrace();
+                                    } catch (IOException e) {  //superclass
+                                        e.printStackTrace();
+                                    }
+                                    ==> if we change the order above, catch super class first , then catch subclass, the code will not compile
+                                }
+                        Example 2A: One exception is independent of another
+                                void readFirstByteFromFile(File fileName){
+                                    try {
+                                        FileInputStream file = new FileInputStream(fileName);
+                                        byte x = (byte) file.read();
+                                        System.out.println(x);
+                                    } catch (IOException e) {
+                                        e.printStackTrace();
+                                    } catch (NumberFormatException e) {
+                                        e.printStackTrace();
+                                    }
+                                    ==> if we change the order above, it's OK because they are independent
+                                }
+                        Example 2B: One exception is independent of another
+                                void readFirstByteFromFile(File fileName){
+                                    try {
+                                        FileInputStream file = new FileInputStream(fileName);
+                                        byte x = (byte) file.read();
+                                        System.out.println(x);
+                                    } catch (IOException | NumberFormatException e) {  //this syntax only works for independent classes
+                                        e.printStackTrace();
+                                    }
+                                    ==> syntax here: catch (nameOfException1 | nameOfException2 referenceVariable)
+                                }
+                finally block
+                        Example:
+                                void readFirstByteFromFile(File fileName){
+                                    try {
+                                        FileInputStream file = new FileInputStream(fileName);
+                                        byte x = (byte) file.read();
+                                        System.out.println(x);
+                                    } catch (IOException | NumberFormatException e) {
+                                        e.printStackTrace();
+                                    } finally {   //executed whether exception is caught or not
+                                        System.out.println("Running readFirstByteFromFile...");
+                                    }
+                                }
+                try-with-resources
+                        Resource management:
+                                Any external data sources (files, databases, etc...) are referred to as resources
+                                Dealing with resource almost always requires three steps:
+                                        1. Opening the resource
+                                        2. Dealing with the resource(e.g read/write)
+                                        3. Closing the resource
+                                Forgetting to close the resource can cause many bad things
+                                        1. Resource leak results in resource becoming inaccessible
+                                        2. e.g inability to connect to database by your or other programs, etc...
+                        Example 1:
+                                //do not use try-with-resources
+                                //method that opens a file, reads the data and closes the file
+                                public void readFile(String file){
+                                    FileInputStream is = null;
+                                    try {
+                                        is = new FileInputStream("myFile.txt");
+                                        //read file data
+                                    } catch (IOException e) {
+                                        e.printStackTrace();
+                                    } finally {
+                                        if (is != null){
+                                            try {
+                                                is.close();
+                                            } catch (IOException e2){
+                                                e2.printStackTrace();
+                                            }
+                                        }
+                                    }
+                                }
+                        Example 2:
+                                //use try-with-resources
+                                //also known as automatic resource management
+                                public void readFile(String file){
+                                    try(FileInputStream is = new FileInputStream("myFile.txt")){ //opening the resource and close it automatically
+                                        //read file data
+                                    } catch (IOException e){
+                                        e.printStackTrace();
+                                    }
+                                }
+                        Example 3:
+                                //creating custom resource
+                                public class MyFileClass implements AutoClosable{
+                                    private final int num;
+                                    public MyFileClass(int num){
+                                        this.num = num;
+                                    }
+                                    @Override
+                                    public void close(){
+                                        System.out.println("Closing MyFileClass #" + num); //implementation of method close()
+                                    }
+                                }
+                                //now using MyFileClass resource with explicit finally block
+                                try(MyFileClass bookReader = new MyFileClass(1);
+                                    MyFileClass movieReader = new MyFileClass(2)){
+                                        System.out.println("try block");
+                                        throw new RuntimeException();
+                                    } catch (Exception e){
+                                        System.out.println("Catch block");
+                                    } finally {
+                                        System.out.println("finally block");
+                                    }
+                                ==> Output is:
+                                    try block
+                                    closing MyFileClass #2  (program will close all the resources, start with the latest that is MyFileClass(2))
+                                    closing MyFileClass #1
+                                    Catch block
+                                    finally block
