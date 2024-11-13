@@ -2993,10 +2993,98 @@
                 Checked exception is declared when defining a method
                     using keyword throws
                 Checked exception is handled using try-catch block
-
-
-                ............................................................
-                ............................................................
+        Example:
+                void readFirstByteFromFile(File fileName){
+                    FileInputStream file = new FileInputStream(fileName);
+                    byte x = (byte) file.read();
+                    System.out.println(x);
+                }
+                //The code above will not be compiled because there are 2 possible issues,
+                first is file not found, the second is the file maybe empty, so if it's empty
+                and you try to read it, that's why java will not compile the block code above
+                //First is to declare exception
+                void readFirstByteFromFile(File fileName) throws IOException{ //this compiles, but still we didn't handle the exception
+                    FileInputStream file = new FileInputStream(fileName);
+                    byte x = (byte) file.read();
+                    System.out.println(x);
+                }
+                //Second solution is to handle exceptions using try-catch block
+                void readFirstByteFromFile(File fileName){
+                    try {
+                        FileInputStream file = new FileInputStream(fileName);
+                        byte x = (byte) file.read();
+                        System.out.println(x);
+                    } catch (IOException e){
+                        e.printStackTrace();
+                    }
+                    //this now compiles, and also to best practices
+                }
+        Main method must also declare or handle the CHECKED exception
+                Example 4:
+                        class OutOfMilkException extends Exception{
+                            //custom checked exception
+                        }
+                        public class MyClass{
+                            private static void getMilk() throws OutOfMilkException{
+                                System.out.println("Getting the milk...");
+                            }
+                            public static void main(String[] args){
+                                getMilk(); //DOES NOT COMPILE, because the main call getMilk() that declares the Checked Exception
+                                                               then it must declare or handle exception
+                            }
+                            //To fix
+                            public static void main(String[] args) throws OutOfMilkException{
+                                getMilk(); //OK
+                            }
+                        }
+        Unchecked exceptions:
+                May or may not be handled
+                Example 1: unchecked exception - do not handle
+                        public class MyClass{
+                            private static void printFourthElement(int[ a){
+                                System.out.println(a[3]);
+                            }
+                            public static void main(String[] args){
+                                int[] a = { -7, 11, 3};
+                                printFourthElement(a); //Will get exception Array index out of bound here when running
+                            }
+                        }
+                Example 2: unchecked exception - but with exception handled
+                        public class MyClass{
+                            private static void printFourthElement(int[ a){
+                                try {
+                                    System.out.println(a[3]);
+                                } catch (ArrayIndexOutOfBoundsException e){
+                                    System.out.println("There is no fourth element in the array. Sorry !!");
+                                }
+                            }
+                            public static void main(String args[]){
+                                int[] a = {-7, 11, 3};
+                                printFourthElement(a); //Output is: There is no fourth element in the array. Sorry !!  (without any exception threw)
+                            }
+                        }
+                You can also manually throw an exception
+                        Example 3:
+                                public class Student{
+                                    private int id;
+                                    private String fullName;
+                                    public Student(int id, String fullName){
+                                        if(id < 10 || fullName.length() > 100)
+                                            throw new IllegalArgumentException();
+                                        this.id = id;
+                                        this.fullName = fullName;
+                                    }
+                                    public static void main(String[] args){
+                                        Student student = new Student(1, "Foden Duong"); //the IllegalArgumentException will be threw here, because id < 10
+                                    }
+                                }
+                Unchecked Exceptions summary
+                        |   ArithmeticException             |   Thrown when code tries to divide with zero                                                                                                          |
+                        |   ArrayIndexOutOfBoundsException  |   Thrown when code uses illegal index to access array element                                                                                         |
+                        |   ClassCastException              |   Thrown when code tries to cast object to a class of which it is not an instance                                                                     |
+                        |   NullPointerException            |   Thrown when there is a null reference where object is required                                                                                      |
+                        |   IllegalArgumentException        |   Thrown by a programmer to indicate that the illegal or inappropriate argument has been passed to a method                                           |
+                        |   NumberFormatException           |   Subclass of IllegalArgumentException, thrown then the code tries to convert String to a numeric type, but String doesn't have an appropriate format |
                 Catching multiple exceptions
                         Example 1: One exception is a subclass of another
                                 void readFirstByteFromFile(File fileName){
@@ -3104,7 +3192,7 @@
                                 try(MyFileClass bookReader = new MyFileClass(1);
                                     MyFileClass movieReader = new MyFileClass(2)){
                                         System.out.println("try block");
-                                        throw new RuntimeException();
+                                        throw new RuntimeException(); //because exceptions here, so program will call the close() method to close resource
                                     } catch (Exception e){
                                         System.out.println("Catch block");
                                     } finally {
@@ -3116,3 +3204,66 @@
                                     closing MyFileClass #1
                                     Catch block
                                     finally block
+                Suppressed Exceptions
+                        Suppose close() can throw an exception, e.g
+                            public void close() throws IllegalStateExpression{
+                                throw new IllegalStateException("The door does not close");
+                            }
+                        if try-with-resources block also throws an exception in catch block then
+                            only the first exception iwill be caught
+                            other exceptions will be suppressed
+                        Example:
+                                public class Door implements AutoClosable{
+                                    public void close() throws IllegalStateExpression{
+                                        throw new IllegalStateException("The door does not close"); //2nd exception, so it will be suppressed
+                                    }
+                                    public static void main(String[] args){
+                                        try(Door d = new Door()){
+                                            throw new IllegalStateException("Something is wrong"); //1st exception, so it will be caught
+                                        } catch (IllegalStateExpression e){
+                                            System.out.println("caught: " + e.getMessage());
+                                            for(Throwable t : e.getSuppressed()){                    //Use this for loop to print out all the suppressed exceptions
+                                                System.out.println("suppressed: " + t.getMessage());
+                                            }
+                                        }
+                                    }
+                                }
+                                //Output is:
+                                    caught: Something is wrong
+                                    suppressed: The door does not close
+46. Math APIs
+        min() and max()
+                Example:
+                        int a = Math.max(3, 11); //a = 11
+                        int b = Math.min(2, -4); //b = -4
+                You can compare all types of numbers, but be aware of autocasting
+                        Example:
+                                long a = 5;
+                                int b = 3;
+                                int c = Math.max(a, b); //DOES NOT COMPILE, because when we have a is long, and b is int, then the autocasting will be performed on b
+                                                                            so both numbers will be long now, then c must b long, but we declare c as int, that's why compile error comes here
+                                to fix, define c as long, or declare casting like below
+                                int c = (int) Math.max(a, b); //c = 5
+        round()
+                Takes decimal number and returns integral number
+                        if parameter is float, return type will be int
+                        if parameter is double, return type will be long
+                Example:
+                        double d = 2.56;
+                        long a = Math.round(d); //a = 3
+                        int b = Math.round(d); //DOES NOT COMPILE, because d type double, so Math.round(d) will return a long number not int
+        ceil() and floor()
+                Take any number and always returns double
+                Example:
+                        double r = Math.ceil(2.45); //r = 3.0
+                        double p = Math.floor(2.45); //p = 2.0
+                        double q = Math.floor(2.99); //r = 2.0
+        pow() - exponents
+                Takes any number, returns double
+                Example:
+                        double p = Math.pow(2, 5); //p = 32.0
+                        double q = Math.pow(25, 0.5); //q = 5.0
+        random numbers
+                Example:
+                        double ran = Math.random();
+                        => random number between 0 and 1.0 (not included - exclusive)
