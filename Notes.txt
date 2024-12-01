@@ -3267,3 +3267,81 @@
                 Example:
                         double ran = Math.random();
                         => random number between 0 and 1.0 (not included - exclusive)
+47. Enums
+..........
+..........
+48. Sealed Classes
+        Used to restrict which other classes may directly extend your class
+        New keywords: sealed, non-sealed, permits
+        Sealed classes must be declared in the same package as its direct subclasses
+        Every listed subclass must extend the sealed class
+        Every subclass must have one of these class modifiers: final, sealed, non-sealed
+        Example:
+                public sealed class Car permits Ford, Renault, Fiat {}
+                //each of these class must extend Car
+                //subclasses have to made either final, sealed, or non-sealed
+        Interface can also be made sealed
+        Example:
+                public sealed interface Mammal permits Cat, Dog, Eats {}
+                //Cat, Dog, and Eats could be classes or interfaces
+                public non-sealed interface Eats extends Mammal {}
+                //!!!Interface can not be final
+                //classes must implement interface Mammal directly or indirectly
+                public final class Cat implements Mammal {} //directly
+                public final class Dog implements Eats {} //indirectly via Eats interface
+49. Records : introduced in java14 and become official in Java16
+        Encapsulated classes, but without boilerplate code
+        The encapsulation is secured
+        constructor, getters, toString(), equals(), and hashCode() are generated
+        Record cannot have explicit instance fields
+        Record can have instance methods
+        Record can have static fields and methods
+        Example:
+                //The old way to create an encapsulated class
+                public final class Student {
+                    private final String firstName;
+                    private final String lastName;
+                    private final int age;
+                    public Student(String firstName, String lastName, int age){
+                        this.firstName = firstName;
+                        this.lastName = lastName;
+                        this.age = age;
+                    }
+                    public String getFirstName(){
+                        return firstName;
+                    }
+                    public String getLastName(){
+                        return lastName;
+                    }
+                    pubblic int getAge(){
+                        return age;
+                    }
+                    @Override
+                    public String toString(){
+                        return "Student{" + "fistName='" + firstName + '\'' +
+                        ", lastName='" + lastName + '\'' +
+                        ", age='" + age + '}';
+                    }
+                    @Override
+                    public boolean equals(Object o){
+                        if(this == 0) return true;
+                        if(o == null || getClass() != o.getClass()) return false;
+                        Student student = (Student) o;
+                        return age == student.age && Objects.equals(firstName, student.firstName) && Objects.equals(lastName, student.lastName);
+                    }
+                    @Override
+                    public int hashCode(){
+                        return Objects.hash(firstName, lastName, age);
+                    }
+                }
+                //All of the code above can be replaced by only ONE line
+                public record Student(String firstName, String lastName, int age);
+                var myInfo = new Student("Foden", "Duong", 26);
+                System.out.println(myInfo.firstName());
+                //toString() is nicely implemented
+                System.out.println(myInfo);
+                //Output is: Student[firstName = Foden, lastName = Duong, age = 26];
+                //equals() is implemented as we would expect
+                var inInfo1 = new Student("Vinh", "Duong", 27);
+                System.out.println(myInfo == muInfo1); //Output is: false
+                System.out.println(myInfo.equals(myInfo1));
