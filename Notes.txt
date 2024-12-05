@@ -3744,3 +3744,195 @@
                 System.out.println(myOptional.orElseThrow()); //Output is NoSuchElementException
                 System.out.println(myOptional.orElseThrow(() -> new IllegalStateException()); //Output is IllegalStateException
                 => if myOptional wasn't empty, the value will be returned in all cases
+        Creating a stream source
+                Stream creation methods:
+                    Stream.empty() => Creates stream with zero elements -> Finite = Yes
+                    Stream.of(varargs) => Creates stream with element listed in varargs -> Finite = Yes
+                    coll.stream() => Creates stream from collection -> Finite = Yes
+                    coll.parallelStream() => Creates parallel stream from collection -> Finite = Yes
+                    Stream.generate(supplier) => Creates stream by calling supplier for each element upon request -> Finite = No
+                    Stream.iterate(seed, unaryOperator) => Creates stream by using seed for first element and then calls UnaryOperator for each subsequent element -> Finite = No
+                    Stream.iterate(seed, predicate, unaryOperator) => same as before, but stops if Predicate returns false -> Finite = Depends
+                Example 1: Create finite stream ( from example 1 to example 4)
+                        Stream<String> empty = Stream.empty();
+                        Stream<Integer> singleElement = Stream.of(1);
+                        Stream<Integer> fromArray = Stream.of(1,2,3);
+                Example 2: Convert Collection to Stream
+                        var list = List.of("Foden", "Vinh", "Duong");
+                        Stream<String> toStream = list.Stream();
+                Example 3: Parallel stream (operations are done in parallel rather then in sequence)
+                        var list = List.of("Foden", "Vinh", "Duong");
+                        Stream<String> toParallelStream = list.parallelStream();
+                Example 4: Create infinite stream (from example 4 to example 5)
+                        Stream<Double> randoms = Stream.generate(Math::random); //Passing here the supplier
+                        Stream<Integer> oddNumbers = Stream.iterate(1, n -> n + 2); //Passing here 1 as seed, and n -> n + 2 as UnaryOperator
+                        => These streams are infinite, they generate values and infinitum
+                        randoms.forEach(System.out::println);
+                        => Program prints random numbers until you kill it
+                        => Operations like limit() can turn infinite stream to finite one.
+                Example 5: Create odd numbers less than 50
+                        Stream<Integer> oddNumbersLessThanFifty = Stream.iterate(1, n -> n < 50, n -> n + 2); //Passing here 1 as seed, n -> n < 50 as predicate, and n -> n + 2 as unaryOperator
+                        => Stream will stop when the predicate returns false, means n < 50 = false in this case
+        Terminating the Stream
+                Some methods
+                        count() -> When applied on infinite stream, does not terminate -> Returns long -> Reduction = Yes
+                        min() and max() -> When applied on infinite stream, does not terminate -> Returns Optional<T> -> Reduction = Yes
+                        findAny() and findFirst() -> When applied on infinite stream, terminates -> Returns Optional<T> -> Reduction = No
+                        allMatch(), anyMatch(), and noneMatch() -> When applied on infinite stream, sometimes terminates -> Returns boolean -> Reduction = No
+                        forEach() -> When applied on infinite stream, does not terminate -> Returns void -> Reduction = No
+                        reduce() -> When applied on infinite stream, does not terminate -> Returns varies -> Reduction = Yes
+                        collect() -> When applied on infinite stream, does not terminate -> Returns varies -> Reduction = Yes
+                Example 1: Counting
+                        Stream<String> names = Stream.of("Foden", "Vinh", "Duong");
+                        System.out.println(names.count()); //Returns long value = 3, and also terminates the stream
+                Example 2: Finding minimum and maximum
+                        Stream<String> names = Stream.of("John", "George", "Ben");
+                        Optional<String> min = names.min((s1, s2) -> s1.length() - s2.length()); //first compare John and George, then because John is shorter, will compare John and Ben, result should be Ben
+                        min.ifPresent(System.out::println); //Output is Ben
+
+                        //Using with empty stream
+                        Optional<?> empty = Stream.empty().min((s1, s2) -> 0);
+                        System.out.println(empty.isPresent()); //Output is false
+                        => These methods above hang if applied to an infinite stream
+                Example 3: Finding a value
+                        Stream<String> names = Stream.of("Foden", "Duong", "Vinh");
+                        Stream<String> infiniteStream = Stream.generate(() -> "Foden"); //This is an infinite stream
+                        names.findAny().ifPresent(System.out::println); //Output is usually the first element -> Foden
+                        infiniteStream.findAny().ifPresent(System.out::println); //Output is Foden, also the stream is terminated by method findAny()
+                Example 4: Matching
+                        var myList = List.of("Foden", "25", "Duong");
+                        Stream<String> inf = Stream.generate(() -> "John");
+                        Predicate<String> p = s -> Character.isLetter(s.charAt(0)); //checks if the name begins with a letter
+                        System.out.println(myList.stream().anyMatch(p)); //Output is true
+                        System.out.println(myList.stream().allMatch(p)); //Output is false
+                        System.out.println(myList.stream().noneMatch(p)); //Output is false
+
+                        System.out.println(inf.anyMatch(p)); //Output is true, and because true then the stream is terminated
+                Example 5: Iterating
+                        Stream<String> names = Stream.of("Foden", "Duong", "Vinh");
+                        names.forEach(System.out::print); //Output is: FodenDuongVinh  (method argument is Consumer, returns void)
+                        => NOTE: You can not use traditional for loop on a stream
+                                Stream<Integer> numbers = Stream.of(2,3,4);
+                                for(Integer i : numbers) {
+                                    //Do somethings here
+                                }
+                                => DOES NOT COMPILE
+                        => forEach() is not really a loop, but rather a terminal operator for streams
+                Example 6: Reducing - usually starts with initial value and merge to the next value
+                        var myArray = new String[] {"F", "o", "d", "e", "n"};
+                        var result = ""; //initial value, called identity
+                        for(var s : myArray) {
+                            result = result + s; //called accumulator
+                        }
+                        System.out.println(result); //Output is Foden
+
+                        //Do the same thing using stream
+                        Stream<String> myStream = Stream.of("F", "o", "d", "e", "n");
+                        String myName = myStream.reduce("", (s, c) -> (s + c)); // "" is identity, (s, c) -> (s + c) is called accumulator passed as BinaryOperator
+                        System.out.println(myName); //Output is Foden
+
+                        //Another way
+                        Stream<String> myStream = Stream.of("F", "o", "d", "e", "n");
+                        String myName = myStream.reduce("", String::concat);
+                        System.out.println(myName); //Output is the same -> Foden
+
+                        //Another sub-example
+                        Stream<Integer> myNumbers = Stream.of(2, 5, 3);
+                        int finalResult = myNumbers.reduce(1, (a, b) -> (a + b));
+                        System.out.println(finalResult); //Output is 1 + 2 + 5 + 3 = 11
+
+                        //If you omit the identity, Optional will be returned
+                        BinaryOperator<Integer> op = (a, b) -> (a * b);
+                        Stream<Integer> empty = Stream.empty();
+                        Stream<Integer> oneNumber = Stream.of(4);
+                        Stream<Integer> threeNumbers = Stream.of(3, 6, 2);
+                        empty.reduce(op).ifPresent(System.out::println); //Output is nothing, because we omit identity then Optinal with empty value is returned, nothing will be printed to console
+                        oneNumber.reduce(op).ifPresent(System.out::println); //Output is 4
+                        threeNumbers.reduce(op).ifPresent(System.out::println); //Output is 36
+
+                        //When dealing with different types
+                        Stream<String> names = Stream.of("Foden", "Duong", "Vinh");
+                        int len = names.reduce(0, (i, s) -> (i + s.length()), (a, b) -> (a + b)); //0 is initializer, (i, s) -> (i + s.length() is accumulator, (a, b) -> (a + b) is combiner
+                        System.out.println(len); //Output is 16 -> step-by-step execution -> initial value i = 2 -> 2 + 5 = 7, 7 + 5 = 12, 12 + 4 = 16
+                Example 7: Mutable reduction
+                        Stream<String> myString = Stream.of("F", "o", "d", "e", "n");
+                        StringBuilder myName = Stream.collect(
+                            StringBuilder::new,  //supplier, creates the object that will store the result as we collect data
+                            StringBuilder::append, //accumulator, passed as BiConsumer
+                            StringBuilder::append  //combiner, also passed as BiConsumer
+                        );
+                        System.out.println(myName); //Output is Foden
+                        //If this was a parallel stream, the output is unpredictable
+
+                        //Keeping the order in the collection (sorted)
+                        Stream<String> myStream = Stream.of("F", "o", "d", "e", "n");
+                        TreeSet<String> mySet = myStream.collect(TreeSet::new, TreeSet::add, TreeSet::addAll); //supplier/accumulator/combiner
+                        System.out.println(mySet); //The output is: [F, d, e, n, o] -> Uppercase comes before lower case, then sorted by alphabet
+
+                        //Using Collectors class
+                        Stream<String> myStream = Stream.of("F", "o", "d", "e", "n");
+                        TreeSet<String> mySet = myStream.collect(Collectors.toCollection(TreeSet::new));
+                        System.out.println(mySet); //The output is the same as above:  [F, d, e, n, o] -> Uppercase comes before lower case, then sorted by alphabet
+
+                        //If we don't care about the order
+                        Stream<String> myStream = Stream.of("F", "o", "d", "e", "n");
+                        Set<String> mySet = myStream.collect(Collectors.toSet());
+                        System.out.println(mySet); //The output is unpredictable
+        Using intermediate operations
+                Produces a stream as a result
+                Can deal with infinite streams -> by returning another infinite stream
+                Can be omitted in a pipeline -> unlike source and terminal operations
+                Example 1: Filtering
+                        Stream<String> names = Stream.of("Foden", "Duong", "Vinh", "Don");
+                        names.filter(s -> s.startsWith("D")).forEach(System.out::println); //names is source, filter(s -> s.startsWith("D")) is intermediate operation,
+                                                                                           //s -> s.startsWith("D") is Predicate
+                                                                                           //forEach(System.out::println) is terminal operation
+                        //Output is:
+                        Duong
+                        Don
+                Example 2: Removing duplicates
+                        Stream<String> names = Stream.of("Foden", "Duong", "Foden", "Foden");
+                        names.distinct().forEach(System.out::print); //distinct() is intermediate operation
+                        //Output is: FodenDuong
+                Example 3: Restricting by position
+                        Stream<Integer> numbers = Stream.iterate(1, n -> n + 1);
+                        numbers.skip(3).limit(4).forEach(System.out::print); //Skip the first 3 elements (1, 2, 3) and limit the size of numbers to 4
+                        //Output is 4567
+                Example 4: Mapping using map() method
+                        Stream<String> names = Stream.of("Foden", "Duong", "Vinh");
+                        names.map(s -> s.length()).forEach(System.out::print); //Output is: 554
+                Example 5: Mapping using flatMap() method
+                        List<String> zero = List.of();
+                        List<String> one = List.of("Foden");
+                        List<String> two = List.of("Foden", "Duong");
+                        Stream<List<String>> names = Stream.of(zero, one, two);
+                        names.flatMap(m -> m.stream()).forEach(System.out.println); //argument of flatMap() is function removes the empty list
+                        //Output is:
+                        Foden
+                        Foden
+                        Duong
+                Example 6: Sorting
+                        Stream<String> names = Stream.of("Foden", "Duong", "Vinh");
+                        names.sorted().forEach(System.out::print);; //Output is: DuongFodenVinh
+
+                        //We can provide Comparator as an argument
+                        Stream<String> names = Stream.of("Foden", "Duong", "Vinh");
+                        names.sorted(Comparator.comparingInt(String::length)).forEach(System.out::print); //Output is: VinhFodenDuong (Vinh is shortest comes first
+                                                                                                          //then the length of Foden and Duong equals, first come first serve)
+                Example 7: peek()
+                        Stream<String> names = Stream.of("Foden", "Duong", "Vinh", "Don");
+                        long count = names.filter(s -> s.startsWith("D")).peek(System.out::println).count(); //Use peek() to see what's going on in the pipeline before we count
+                                                                                                //forEach() and count() are the terminal operations, so can not be used at the same pipeline,
+                                                                                                //so in that case we need peek() to do the print out.
+                        System.out.println(count);
+                        //Output is:
+                        Duong
+                        Don
+                        2
+
+
+
+
+
+
+
